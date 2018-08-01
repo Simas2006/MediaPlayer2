@@ -1,21 +1,40 @@
 import React from 'react';
-import {StyleSheet,TouchableOpacity,Text,View} from 'react-native';
+import {ScrollView,StyleSheet,TouchableOpacity,Text,View} from 'react-native';
 
 export default class App extends React.Component {
   constructor() {
     super();
+    this.httpDevice = new HTTPDevice();
     this.state = {
       path: [],
+      items: [],
       mode: 0
     }
   }
   render() {
     return (
-      <MusicListPage path={this.state.path} mode={this.state.mode} update={this.updatePageState} />
+      <ScrollView>
+        <MusicListPage
+          path={this.state.path}
+          mode={this.state.mode}
+          items={this.state.items}
+          updateParam={this._updateParam.bind(this)}
+          setParam={this._setParam.bind(this)}
+        />
+      </ScrollView>
     );
   }
-  retrieveData(message,callback) {
-    callback(message + "_sage");
+  _updateParam(message,param) {
+    this.httpDevice.transmit(message,output => {
+      var obj = {}
+      obj[param] = output;
+      this.setState(obj);
+    });
+  }
+  _setParam(param,value) {
+    var obj = {};
+    obj[param] = value;
+    this.setState(obj);
   }
 }
 
@@ -44,17 +63,26 @@ class Button extends React.Component {
 class MusicListPage extends React.Component {
   constructor() {
     super();
-    this.state = {}
   }
   render() {
-    //this.props.retrieveData("havanese");
     return (
       <View>
         <Title text={"Music" + (this.props.path.length > 0 ? "/" : "") + this.props.path.join("/")} />
         <Text style={styles.normalText}>{this.props.mode == 1 ? "DA" : "nyet"}</Text>
-        <Button onPress={_ => console.log("my button!")} text="my button" style={styles.redText} />
+        <Button onPress={_ => this._setPath()} text={this.props.items.join(",") || "expand"} style={styles.redText} />
+        <Text>{"\n"}</Text>
       </View>
     );
+  }
+  _setPath() {
+    this.props.updateParam("GET","items");
+    this.props.setParam("path",["EVOLVE"]);
+  }
+}
+
+class HTTPDevice { // mock device ONLY
+  transmit(message,callback) {
+    callback(["foldera","folderb","folderc"]);
   }
 }
 
