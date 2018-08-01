@@ -14,7 +14,7 @@ export default class App extends React.Component {
   render() {
     return (
       <ScrollView>
-        <MusicListPage
+        <MusicPage
           path={this.state.path}
           mode={this.state.mode}
           items={this.state.items}
@@ -53,30 +53,33 @@ class Title extends React.Component {
 class Button extends React.Component {
   render() {
     return (
-      <TouchableOpacity onPress={this.props.onPress}>
+      <TouchableOpacity onPress={this.props.onPress} style={styles.fullwidth}>
         <Text style={this.props.style}>{this.props.text}</Text>
       </TouchableOpacity>
     );
   }
 }
 
-class MusicListPage extends React.Component {
+class MusicPage extends React.Component {
   constructor() {
     super();
+  }
+  componentWillMount() {
+    this.props.updateParam("GET /music","items");
+    this.props.setParam("firstLoad",false);
   }
   render() {
     return (
       <View>
         <Title text={"Music" + (this.props.path.length > 0 ? "/" : "") + this.props.path.join("/")} />
-        <Text style={styles.normalText}>{this.props.mode == 1 ? "DA" : "nyet"}</Text>
-        <Button onPress={_ => this._setPath()} text={this.props.items.join(",") || "expand"} style={styles.redText} />
+        {
+          this.props.items.map((item,index) => (
+            <Button text={item} onPress={_ => console.log(index)} style={styles.blueText} key={index} />
+          ))
+        }
         <Text>{"\n"}</Text>
       </View>
     );
-  }
-  _setPath() {
-    this.props.updateParam("GET","items");
-    this.props.setParam("path",["EVOLVE"]);
   }
 }
 
@@ -96,9 +99,9 @@ var styles = StyleSheet.create({
   normalText: {
     fontSize: 25
   },
-  redText: {
+  blueText: {
     fontSize: 25,
-    color: "red"
+    color: "blue"
   },
   titleText: {
     fontSize: 25,
@@ -113,5 +116,8 @@ var styles = StyleSheet.create({
     borderBottomColor: "black",
     borderBottomWidth: 1,
     paddingBottom: "1%"
+  },
+  fullwidth: {
+    width: "100%"
   }
 });
