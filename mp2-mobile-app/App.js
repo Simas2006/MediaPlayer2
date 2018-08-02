@@ -61,7 +61,9 @@ class NavigationPage extends React.Component {
     super();
   }
   componentWillMount() {
-    this.props.updateParam("GET /music","items");
+    this.props.httpDevice.transmit("LIST /music",output => {
+      this.props.setParam("items",output);
+    });
   }
   render() {
     var path = this.props.path.join("/");
@@ -71,15 +73,25 @@ class NavigationPage extends React.Component {
         <Title text={path} />
         {
           this.props.items.map((item,index) => (
-            <Button text={item} onPress={_ => moveForward(index)} style={styles.blueText} key={sha256(item).toString()} />
+            <Button text={item} onPress={_ => this._moveForward(item)} style={styles.blueText} key={sha256(item).toString()} />
           ))
         }
         <Text>{"\n"}</Text>
       </View>
     );
   }
-  moveForward(item) {
-    
+  _moveForward(item) {
+    this.props.httpDevice.transmit(`TYPE /${this.props.path.join("/")}`,output => {
+      if ( output == "directory" ) {
+        this.props.path.push(item);
+        this.props.httpDevice.transmit(`LIST /${this.props.path.join("/")}`,output => {
+          this.props.setParam("items",output);
+          this.props.setParam("path",this.props.path);
+        });
+      } else {
+        // TODO
+      }
+    });
   }
 }
 
