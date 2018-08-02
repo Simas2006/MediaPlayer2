@@ -7,30 +7,25 @@ export default class App extends React.Component {
     super();
     this.httpDevice = new HTTPDevice();
     this.state = {
-      path: [],
+      component: "NavigationPage",
+      path: ["music","evolve"],
       items: [],
-      mode: 0
+      nextComponent: "MusicPage"
     }
   }
   render() {
+    if ( this.state.component != "NavigationPage" ) return null;
     return (
       <ScrollView>
-        <MusicPage
+        <NavigationPage
           path={this.state.path}
           mode={this.state.mode}
           items={this.state.items}
-          updateParam={this._updateParam.bind(this)}
           setParam={this._setParam.bind(this)}
+          httpDevice={this.httpDevice}
         />
       </ScrollView>
     );
-  }
-  _updateParam(message,param) {
-    this.httpDevice.transmit(message,output => {
-      var obj = {}
-      obj[param] = output;
-      this.setState(obj);
-    });
   }
   _setParam(param,value) {
     var obj = {};
@@ -61,32 +56,38 @@ class Button extends React.Component {
   }
 }
 
-class MusicPage extends React.Component {
+class NavigationPage extends React.Component {
   constructor() {
     super();
   }
   componentWillMount() {
     this.props.updateParam("GET /music","items");
-    this.props.setParam("firstLoad",false);
   }
   render() {
+    var path = this.props.path.join("/");
+    path = path.charAt(0).toUpperCase() + path.slice(1);
     return (
       <View>
-        <Title text={"Music" + (this.props.path.length > 0 ? "/" : "") + this.props.path.join("/")} />
+        <Title text={path} />
         {
           this.props.items.map((item,index) => (
-            <Button text={item} onPress={_ => console.log(sha256(item).toString())} style={styles.blueText} key={sha256(item).toString()} />
+            <Button text={item} onPress={_ => moveForward(index)} style={styles.blueText} key={sha256(item).toString()} />
           ))
         }
         <Text>{"\n"}</Text>
       </View>
     );
   }
+  moveForward(item) {
+    
+  }
 }
 
 class HTTPDevice { // mock device ONLY
   transmit(message,callback) {
-    callback(["foldera","folderb","folderc"]);
+    message = message.split(" ");
+    if ( message[0] == "LIST" ) callback(["foldera","folderb","folderc"]);
+    else if ( message[0] == "TYPE" ) callback("directory");
   }
 }
 
