@@ -1,5 +1,6 @@
 import React from 'react';
 import {ScrollView,StyleSheet,TouchableOpacity,Text,View} from 'react-native';
+import sha256 from 'crypto-js/sha256'
 
 export default class App extends React.Component {
   constructor() {
@@ -74,7 +75,7 @@ class MusicPage extends React.Component {
         <Title text={"Music" + (this.props.path.length > 0 ? "/" : "") + this.props.path.join("/")} />
         {
           this.props.items.map((item,index) => (
-            <Button text={item} onPress={_ => console.log(index)} style={styles.blueText} key={index} />
+            <Button text={item} onPress={_ => console.log(sha256(item).toString())} style={styles.blueText} key={sha256(item).toString()} />
           ))
         }
         <Text>{"\n"}</Text>
