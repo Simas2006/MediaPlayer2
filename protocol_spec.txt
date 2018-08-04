@@ -10,6 +10,7 @@ NEXTP                      ; Goes to the next photo. Returns the name of the pho
 
 PLYPS                      ; Plays (or pauses) the current song.
 PNSNG                      ; Plays the next song in the queue. If the queue is empty, will stop playing altogether. Returns the same result as GETQ.
+RWIND                      ; Rewinds the current song to position 0. Returns "ok" normally.
 GETQ                       ; Returns the queue with the full paths of the songs except for /music, comma-separated, with a prefix of "GETQ_".
 CLRQ                       ; Clears the queue and triggers PNSNG. Returns "ok" normally.
 SHFLQ                      ; Shuffles the queue. Returns "ok" normally.
