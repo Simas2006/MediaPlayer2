@@ -7,15 +7,26 @@ export default class App extends React.Component {
     super();
     this.httpDevice = new HTTPDevice();
     this.state = {
-      component: "NavigationPage",
-      path: ["music"],
+      component: "MainPage",
+      path: [],
       items: [],
-      nextComponent: "MusicSelectPage"
+      nextComponent: ""
     }
   }
   render() {
-    if ( this.state.component == "MainPage" ) return null;
-    if ( this.state.component == "NavigationPage" ) {
+    if ( this.state.component == "MainPage" ) {
+      return (
+        <ScrollView>
+          <MainPage
+            path={this.state.path}
+            items={this.state.items}
+            nextComponent={this.state.nextComponent}
+            setParam={this._setParam.bind(this)}
+            httpDevice={this.httpDevice}
+          />
+        </ScrollView>
+      );
+    } else if ( this.state.component == "NavigationPage" ) {
       return (
         <ScrollView>
           <NavigationPage
@@ -70,6 +81,41 @@ class Button extends React.Component {
   }
 }
 
+class MainPage extends React.Component {
+  constructor() {
+    super();
+  }
+  render() {
+    return (
+      <View>
+        <Title text="" />
+        <Text>{"\n"}</Text>
+        <Button
+          text="Photos"
+          onPress={_ => this._openPage("photos")}
+          style={styles.blueText}
+        />
+        <Button
+          text="Music"
+          onPress={_ => this._openPage("music")}
+          style={styles.blueText}
+        />
+        <Button
+          text="Web"
+          onPress={_ => this._openPage("web")}
+          style={styles.blueText}
+        />
+        <Text>{`\nCurrently connected with ID ${this.props.httpDevice.connectionID}`}</Text>
+      </View>
+    );
+  }
+  _openPage(page) {
+    this.props.setParam("nextComponent",capitalizeFirstLetter(page) + "SelectPage");
+    this.props.setParam("path",[page]);
+    this.props.setParam("component","NavigationPage");
+  }
+}
+
 class NavigationPage extends React.Component {
   constructor() {
     super();
@@ -80,8 +126,7 @@ class NavigationPage extends React.Component {
     });
   }
   render() {
-    var path = this.props.path.join("/");
-    path = path.charAt(0).toUpperCase() + path.slice(1);
+    var path = capitalizeFirstLetter(this.props.path.join("/"));
     return (
       <View>
         <Title text={path} />
@@ -127,9 +172,7 @@ class MusicSelectPage extends React.Component {
     });
   }
   render() {
-    console.log(this.props.path);
-    var path = this.props.path.join("/");
-    path = path.charAt(0).toUpperCase() + path.slice(1);
+    var path = capitalizeFirstLetter(this.props.path.join("/"));
     return (
       <View>
         <Title text={path} />
@@ -145,7 +188,7 @@ class MusicSelectPage extends React.Component {
         }
         <View style={styles.hr} />
         <Button
-          text={this._getState().charAt(0).toUpperCase() + this._getState().slice(1) + " All"}
+          text={capitalizeFirstLetter(this._getState()) + " All"}
           onPress={_ => this._toggleAll()}
           style={styles.normalText}
         />
@@ -196,12 +239,14 @@ class MusicSelectPage extends React.Component {
 
 class HTTPDevice { // mock device ONLY
   constructor() {
+    this.connectionID = 91823;
     this.readyTick = 0;
-    setInterval(function() {
+    setInterval(_ => {
       this.readyTick = Math.max(this.readyTick - 1,0);
     },1);
   }
   transmit(message,callback) {
+    //console.log(this.readyTick);
     message = message.split(" ");
     if ( message[0] == "LIST" ) {
       callback(["foldera","folderb","folderc","folderd"]);
@@ -213,6 +258,10 @@ class HTTPDevice { // mock device ONLY
       callback("ok");
     }
   }
+}
+
+function capitalizeFirstLetter(s) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 var styles = StyleSheet.create({
