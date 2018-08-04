@@ -7,8 +7,8 @@ export default class App extends React.Component {
     super();
     this.httpDevice = new HTTPDevice();
     this.state = {
-      component: "NavigationPage",
-      path: ["photos"],
+      component: "MusicSelectPage",
+      path: ["music","Evolve"],
       items: [],
       nextComponent: "MusicSelectPage"
     }
@@ -62,7 +62,7 @@ class Title extends React.Component {
 class Button extends React.Component {
   render() {
     return (
-      <TouchableOpacity onPress={this.props.onPress} style={styles.fullwidth}>
+      <TouchableOpacity onPress={this.props.onPress} style={styles.fullWidth}>
         <Text style={this.props.style}>{this.props.text}</Text>
       </TouchableOpacity>
     );
@@ -86,7 +86,11 @@ class NavigationPage extends React.Component {
         <Title text={path} />
         {
           this.props.items.map((item,index) => (
-            <Button text={item} onPress={_ => this._moveForward(item)} style={styles.blueText} key={sha256(item).toString()} />
+            <Button
+              text={item}
+              onPress={_ => this._moveForward(item)} style={styles.blueText}
+              key={sha256(item).toString()}
+            />
           ))
         }
         <Text>{"\n"}</Text>
@@ -113,7 +117,12 @@ class MusicSelectPage extends React.Component {
     super();
   }
   componentWillMount() {
-
+    this.setState({
+      selected: []
+    });
+    this.props.httpDevice.transmit(`LIST /${this.props.path.join("/")}`,output => {
+      this.props.setParam("items",output);
+    });
   }
   render() {
     var path = this.props.path.join("/");
@@ -121,8 +130,52 @@ class MusicSelectPage extends React.Component {
     return (
       <View>
         <Title text={path} />
+        {
+          this.props.items.map((item,index) => (
+            <Button
+              text={item}
+              onPress={_ => this._toggleItem(index)}
+              style={this.state.selected.indexOf(index) > -1 ? styles.greenText : styles.blueText}
+              key={sha256(item).toString()}
+            />
+          ))
+        }
+        <View style={styles.hr} />
+        <Button
+          text={this._getState().charAt(0).toUpperCase() + this._getState().slice(1) + " All"}
+          onPress={_ => this._toggleAll()}
+          style={styles.normalText}
+        />
       </View>
     );
+  }
+  _toggleItem(index) {
+    if ( this.state.selected.indexOf(index) > -1 ) {
+      this.setState({
+        selected: this.state.selected.filter(item => item != index)
+      });
+    } else {
+      this.setState({
+        selected: this.state.selected.concat([index])
+      });
+    }
+  }
+  _toggleAll() {
+    if ( this._getState() == "select" ) {
+      this.setState({
+        selected: "x".repeat(this.props.items.length).split("").map((item,index) => index)
+      });
+    } else {
+      this.setState({
+        selected: []
+      });
+    }
+  }
+  _getState() {
+    for ( var i = 0; i < this.props.items.length; i++ ) {
+      if ( this.state.selected.indexOf(i) <= -1 ) return "select";
+    }
+    return "deselect";
   }
 }
 
@@ -130,10 +183,9 @@ class HTTPDevice { // mock device ONLY
   transmit(message,callback) {
     console.log(message);
     message = message.split(" ");
-    if ( message[0] == "LIST" ) callback(["foldera","folderb","folderc"]);
+    if ( message[0] == "LIST" ) callback(["foldera","folderb","folderc","folderd"]);
     else if ( message[0] == "TYPE" ) {
-      if ( message[1].split("/").length <= 5 ) callback("directory");
-      else callback("file");
+      callback("file");
     }
   }
 }
@@ -152,6 +204,10 @@ var styles = StyleSheet.create({
     fontSize: 25,
     color: "blue"
   },
+  greenText: {
+    fontSize: 25,
+    color: "green"
+  },
   titleText: {
     fontSize: 25,
     textAlign: "center",
@@ -166,7 +222,7 @@ var styles = StyleSheet.create({
     borderBottomWidth: 1,
     paddingBottom: "1%"
   },
-  fullwidth: {
+  fullWidth: {
     width: "100%"
   }
 });
