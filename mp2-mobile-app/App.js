@@ -14,6 +14,7 @@ export default class App extends React.Component {
     }
   }
   render() {
+    if ( this.state.component == "MainPage" ) return null;
     if ( this.state.component == "NavigationPage" ) {
       return (
         <ScrollView>
@@ -115,11 +116,12 @@ class NavigationPage extends React.Component {
 class MusicSelectPage extends React.Component {
   constructor() {
     super();
+    this.state = {
+      selected: []
+    }
+    this.hasAddedToQueue = false;
   }
   componentWillMount() {
-    this.setState({
-      selected: []
-    });
     this.props.httpDevice.transmit(`LIST /${this.props.path.join("/")}`,output => {
       this.props.setParam("items",output);
     });
@@ -144,6 +146,11 @@ class MusicSelectPage extends React.Component {
         <Button
           text={this._getState().charAt(0).toUpperCase() + this._getState().slice(1) + " All"}
           onPress={_ => this._toggleAll()}
+          style={styles.normalText}
+        />
+        <Button
+          text="Add To Queue"
+          onPress={_ => this._addToQueue()}
           style={styles.normalText}
         />
       </View>
@@ -177,15 +184,32 @@ class MusicSelectPage extends React.Component {
     }
     return "deselect";
   }
+  _addToQueue() {
+    if ( this.hasAddedToQueue ) return;
+    this.hasAddedToQueue = true;
+    this.props.httpDevice.transmit(`ADDTQ /${this.props.path.join("/")} ${this.state.selected.sort((a,b) => a - b).map(item => this.props.items[item]).join(" ")}`,output => {
+      this.props.setParam("component","MainPage");
+    });
+  }
 }
 
 class HTTPDevice { // mock device ONLY
+  constructor() {
+    this.readyTick = 0;
+    setInterval(function() {
+      this.readyTick = Math.max(this.readyTick - 1,0);
+    },1);
+  }
   transmit(message,callback) {
-    console.log(message);
     message = message.split(" ");
-    if ( message[0] == "LIST" ) callback(["foldera","folderb","folderc","folderd"]);
-    else if ( message[0] == "TYPE" ) {
+    if ( message[0] == "LIST" ) {
+      callback(["foldera","folderb","folderc","folderd"]);
+    } else if ( message[0] == "TYPE" ) {
       callback("file");
+    } else if ( message[0] == "ADDTQ" && this.readyTick <= 0 ) {
+      this.readyTick = 100;
+      console.log(message.join(" "));
+      callback("ok");
     }
   }
 }
