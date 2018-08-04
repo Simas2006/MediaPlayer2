@@ -1,0 +1,15 @@
+CONN                       ; Creates an authentication key to be used in place of the password. Is the first message sent to the server.
+DCONN                      ; Deathorizes a given connection. Is the last message sent to the server. Returns "ok" normally.
+LIST  <path>               ; Lists the contents of a directory.
+TYPE  <path>               ; If a directory signified by the path contains only other directories, returns "directory", otherwise, returns "file".
+
+ADDTQ <dirpath> <filelist> ; Adds songs in the dirpath directory to the queue. Returns "ok" normally.
+OPENP <path>               ; Opens a photo album. Returns "ok" normally.
+PREVP                      ; Goes back to the previous photo. Returns the name of the photo normally, with a suffix of "_first" if the result is the first picture.
+NEXTP                      ; Goes to the next photo. Returns the name of the photo normally, with a suffix of "_last" if the result is the last picture.
+
+PLYPS                      ; Plays (or pauses) the current song.
+PNSNG                      ; Plays the next song in the queue. If the queue is empty, will stop playing altogether. Returns the same result as GETQ.
+GETQ                       ; Returns the queue with the full paths of the songs except for /music, comma-separated, with a prefix of "GETQ_".
+CLRQ                       ; Clears the queue and triggers PNSNG. Returns "ok" normally.
+SHFLQ                      ; Shuffles the queue. Returns "ok" normally.
