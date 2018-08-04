@@ -19,8 +19,8 @@ export default class App extends React.Component {
       <ScrollView>
         <NavigationPage
           path={this.state.path}
-          mode={this.state.mode}
           items={this.state.items}
+          nextComponent={this.state.nextComponent}
           setParam={this._setParam.bind(this)}
           httpDevice={this.httpDevice}
         />
@@ -89,7 +89,7 @@ class NavigationPage extends React.Component {
           this.props.setParam("path",this.props.path);
         });
       } else {
-        // TODO
+        this.props.setParam("component",this.props.nextComponent);
       }
     });
   }
@@ -99,7 +99,10 @@ class HTTPDevice { // mock device ONLY
   transmit(message,callback) {
     message = message.split(" ");
     if ( message[0] == "LIST" ) callback(["foldera","folderb","folderc"]);
-    else if ( message[0] == "TYPE" ) callback("directory");
+    else if ( message[0] == "TYPE" ) {
+      if ( message[1].split("/").length <= 5 ) callback("directory");
+      else callback("file");
+    }
   }
 }
 
