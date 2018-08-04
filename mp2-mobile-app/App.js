@@ -88,31 +88,36 @@ class MainPage extends React.Component {
   render() {
     return (
       <View>
-        <Title text="" />
+        <Title text="Home" />
         <Text>{"\n"}</Text>
         <Button
-          text="Photos"
-          onPress={_ => this._openPage("photos")}
+          text="Music"
+          onPress={_ => this._openPage("music","MusicSelectPage",true)}
           style={styles.blueText}
         />
         <Button
-          text="Music"
-          onPress={_ => this._openPage("music")}
+          text="Photos"
+          onPress={_ => this._openPage("photos","PhotoSelectPage",true)}
           style={styles.blueText}
         />
         <Button
           text="Web"
-          onPress={_ => this._openPage("web")}
+          onPress={_ => this._openPage("web","WebSelectPage",false)}
+          style={styles.blueText}
+        />
+        <Button
+          text="Queue"
+          onPress={_ => this._openPage("queue","QueuePage",false)}
           style={styles.blueText}
         />
         <Text>{`\nCurrently connected with ID ${this.props.httpDevice.connectionID}`}</Text>
       </View>
     );
   }
-  _openPage(page) {
-    this.props.setParam("nextComponent",capitalizeFirstLetter(page) + "SelectPage");
+  _openPage(page,componentName,navPage) {
+    this.props.setParam("nextComponent",componentName);
     this.props.setParam("path",[page]);
-    this.props.setParam("component","NavigationPage");
+    this.props.setParam("component",navPage ? "NavigationPage" : componentName);
   }
 }
 
@@ -246,7 +251,6 @@ class HTTPDevice { // mock device ONLY
     },1);
   }
   transmit(message,callback) {
-    //console.log(this.readyTick);
     message = message.split(" ");
     if ( message[0] == "LIST" ) {
       callback(["foldera","folderb","folderc","folderd"]);
