@@ -10,22 +10,35 @@ export default class App extends React.Component {
       component: "NavigationPage",
       path: ["music","evolve"],
       items: [],
-      nextComponent: "MusicPage"
+      nextComponent: "MusicSelectPage"
     }
   }
   render() {
-    if ( this.state.component != "NavigationPage" ) return null;
-    return (
-      <ScrollView>
-        <NavigationPage
-          path={this.state.path}
-          items={this.state.items}
-          nextComponent={this.state.nextComponent}
-          setParam={this._setParam.bind(this)}
-          httpDevice={this.httpDevice}
-        />
-      </ScrollView>
-    );
+    if ( this.state.component == "NavigationPage" ) {
+      return (
+        <ScrollView>
+          <NavigationPage
+            path={this.state.path}
+            items={this.state.items}
+            nextComponent={this.state.nextComponent}
+            setParam={this._setParam.bind(this)}
+            httpDevice={this.httpDevice}
+          />
+        </ScrollView>
+      );
+    } else if ( this.state.component == "MusicSelectPage" ) {
+      return (
+        <ScrollView>
+          <MusicSelectPage
+            path={this.state.path}
+            items={this.state.items}
+            nextComponent={this.state.nextComponent}
+            setParam={this._setParam.bind(this)}
+            httpDevice={this.httpDevice}
+          />
+        </ScrollView>
+      );
+    }
   }
   _setParam(param,value) {
     var obj = {};
@@ -92,6 +105,24 @@ class NavigationPage extends React.Component {
         this.props.setParam("component",this.props.nextComponent);
       }
     });
+  }
+}
+
+class MusicSelectPage extends React.Component {
+  constructor() {
+    super();
+  }
+  componentWillMount() {
+
+  }
+  render() {
+    var path = this.props.path.join("/");
+    path = path.charAt(0).toUpperCase() + path.slice(1);
+    return (
+      <View>
+        <Title text={path} />
+      </View>
+    );
   }
 }
 
