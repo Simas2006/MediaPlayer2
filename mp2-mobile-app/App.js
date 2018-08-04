@@ -8,7 +8,7 @@ export default class App extends React.Component {
     this.httpDevice = new HTTPDevice();
     this.state = {
       component: "NavigationPage",
-      path: ["music","evolve"],
+      path: ["photos"],
       items: [],
       nextComponent: "MusicSelectPage"
     }
@@ -74,7 +74,7 @@ class NavigationPage extends React.Component {
     super();
   }
   componentWillMount() {
-    this.props.httpDevice.transmit("LIST /music",output => {
+    this.props.httpDevice.transmit(`LIST /${this.props.path.join("/")}`,output => {
       this.props.setParam("items",output);
     });
   }
@@ -128,6 +128,7 @@ class MusicSelectPage extends React.Component {
 
 class HTTPDevice { // mock device ONLY
   transmit(message,callback) {
+    console.log(message);
     message = message.split(" ");
     if ( message[0] == "LIST" ) callback(["foldera","folderb","folderc"]);
     else if ( message[0] == "TYPE" ) {
