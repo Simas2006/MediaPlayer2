@@ -7,8 +7,8 @@ export default class App extends React.Component {
     super();
     this.httpDevice = new HTTPDevice();
     this.state = {
-      component: "MusicSelectPage",
-      path: ["music","Evolve"],
+      component: "NavigationPage",
+      path: ["music"],
       items: [],
       nextComponent: "MusicSelectPage"
     }
@@ -100,8 +100,8 @@ class NavigationPage extends React.Component {
   }
   _moveForward(item) {
     this.props.httpDevice.transmit(`TYPE /${this.props.path.join("/")}`,output => {
+      this.props.path.push(item);
       if ( output == "directory" ) {
-        this.props.path.push(item);
         this.props.httpDevice.transmit(`LIST /${this.props.path.join("/")}`,output => {
           this.props.setParam("items",output);
           this.props.setParam("path",this.props.path);
@@ -127,6 +127,7 @@ class MusicSelectPage extends React.Component {
     });
   }
   render() {
+    console.log(this.props.path);
     var path = this.props.path.join("/");
     path = path.charAt(0).toUpperCase() + path.slice(1);
     return (
