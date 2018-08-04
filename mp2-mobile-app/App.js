@@ -16,7 +16,7 @@ export default class App extends React.Component {
   render() {
     if ( this.state.component == "MainPage" ) {
       return (
-        <ScrollView>
+        <View>
           <MainPage
             path={this.state.path}
             items={this.state.items}
@@ -24,7 +24,7 @@ export default class App extends React.Component {
             setParam={this._setParam.bind(this)}
             httpDevice={this.httpDevice}
           />
-        </ScrollView>
+        </View>
       );
     } else if ( this.state.component == "NavigationPage" ) {
       return (
@@ -49,6 +49,18 @@ export default class App extends React.Component {
             httpDevice={this.httpDevice}
           />
         </ScrollView>
+      );
+    } else if ( this.state.component == "PhotoSelectPage" ) {
+      return (
+        <View>
+          <PhotoSelectPage
+            path={this.state.path}
+            items={this.state.items}
+            nextComponent={this.state.nextComponent}
+            setParam={this._setParam.bind(this)}
+            httpDevice={this.httpDevice}
+          />
+        </View>
       );
     }
   }
@@ -160,6 +172,20 @@ class NavigationPage extends React.Component {
         this.props.setParam("component",this.props.nextComponent);
       }
     });
+  }
+}
+
+class PhotoSelectPage extends React.Component {
+  constructor() {
+    super();
+  }
+  render() {
+    var path = capitalizeFirstLetter(this.props.path.join("/"));
+    return (
+      <View>
+        <Title text={path} />
+      </View>
+    );
   }
 }
 
