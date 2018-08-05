@@ -14,11 +14,11 @@ OPENP <path>               ; Opens a photo album. Returns the name of the first 
 PREVP                      ; Goes back to the previous photo. Returns the name of the photo normally, with a suffix of "_first" if the result is the first picture.
 NEXTP                      ; Goes to the next photo. Returns the name of the photo normally, with a suffix of "_last" if the result is the last picture.
 
-PLYPS                      ; Plays (or pauses) the current song.
+PLYPS                      ; Plays (or pauses) the current song. Returns "ok" normally.
 PNSNG                      ; Plays the next song in the queue. If the queue is empty, will stop playing altogether. Returns the same result as GETQ.
 RWIND                      ; Rewinds the current song to position 0. Returns "ok" normally.
 
-GETQ                       ; Returns the queue with the full paths of the songs except for /music, comma-separated, with a prefix of "GETQ,".
+GETQ                       ; Returns the queue with the full paths of the songs except for /music, comma-separated, with a prefix of "playing," or "paused,", depending on the current state of the playing song.
 UPSQ  <index> <totop>      ; Moves the indexed song in the queue upwards one song if totop is false, and up to the top if it is true. Returns the same result as GETQ.
 DWNSQ <index>              ; Moves the indexed song in the queue downward one song. Returns the same result as GETQ.
 DELSQ <index>              ; Removes the indexed song from the queue. Returns the same result as GETQ.
