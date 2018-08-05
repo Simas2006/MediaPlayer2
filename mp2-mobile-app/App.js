@@ -178,14 +178,67 @@ class NavigationPage extends React.Component {
 class PhotoSelectPage extends React.Component {
   constructor() {
     super();
+    this.state = {
+      picName: null,
+      warnMode: 0
+    }
+  }
+  componentWillMount() {
+    this.props.httpDevice.transmit(`OPENP /${this.props.path.join("/")}`,output => {
+      this.setState({
+        picName: output
+      });
+    });
   }
   render() {
     var path = capitalizeFirstLetter(this.props.path.join("/"));
     return (
       <View>
         <Title text={path} />
+        <View>
+          <Text>{"\n"}</Text>
+          <Button
+            text={"\u25c0"}
+            onPress={_ => this._movePicture("left")}
+            style={styles.largeText}
+          />
+          <Text style={styles.largeText}>{this.state.picName}</Text>
+          <Button
+            text={"\u25b6"}
+            onPress={_ => this._movePicture("right")}
+            style={styles.largeText}
+          />
+          <Text style={styles.smallWarning}>{`\n${["First Picture","","Last Picture"][this.state.warnMode + 1]}`}</Text>
+        </View>
       </View>
     );
+  }
+  _movePicture(direction) {
+    if ( direction == "left" ) {
+      this.props.httpDevice.transmit("PREVP",output => {
+        var warnMode = 0;
+        if ( output.endsWith("_first") ) {
+          output = output.slice(0,-6);
+          warnMode = -1;
+        }
+        this.setState({
+          picName: output,
+          warnMode: warnMode
+        });
+      });
+    } else {
+      this.props.httpDevice.transmit("NEXTP",output => {
+        var warnMode = 0;
+        if ( output.endsWith("_last") ) {
+          output = output.slice(0,-5);
+          warnMode = 1;
+        }
+        this.setState({
+          picName: output,
+          warnMode: warnMode
+        });
+      });
+    }
   }
 }
 
@@ -275,6 +328,7 @@ class HTTPDevice { // mock device ONLY
     setInterval(_ => {
       this.readyTick = Math.max(this.readyTick - 1,0);
     },1);
+    this._picIndex = 0;
   }
   transmit(message,callback) {
     message = message.split(" ");
@@ -286,6 +340,14 @@ class HTTPDevice { // mock device ONLY
       this.readyTick = 100;
       console.log(message.join(" "));
       callback("ok");
+    } else if ( message[0] == "OPENP" ) {
+      callback("0.JPG");
+    } else if ( message[0] == "PREVP" ) {
+      this._picIndex--;
+      callback(this._picIndex + ".JPG" + (this._picIndex == 0 ? "_first" : ""));
+    } else if ( message[0] == "NEXTP" ) {
+      this._picIndex++;
+      callback(this._picIndex + ".JPG" + (this._picIndex == 10 ? "_last" : ""));
     }
   }
 }
@@ -312,14 +374,17 @@ var styles = StyleSheet.create({
     fontSize: 25,
     color: "green"
   },
+  smallWarning: {
+    color: "red",
+    textAlign: "center"
+  },
   titleText: {
     fontSize: 25,
     textAlign: "center",
   },
-  normalButton: {
-    fontSize: 25,
-    textAlign: "left",
-    color: "black"
+  largeText: {
+    fontSize: 40,
+    textAlign: "center"
   },
   hr: {
     borderBottomColor: "black",
