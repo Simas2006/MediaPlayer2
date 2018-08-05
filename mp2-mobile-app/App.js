@@ -62,6 +62,18 @@ export default class App extends React.Component {
           />
         </View>
       );
+    } else if ( this.state.component == "QueuePage" ) {
+      return (
+        <ScrollView>
+          <QueuePage
+            path={this.state.path}
+            items={this.state.items}
+            nextComponent={this.state.nextComponent}
+            setParam={this._setParam.bind(this)}
+            httpDevice={this.httpDevice}
+          />
+        </ScrollView>
+      )
     }
   }
   _setParam(param,value) {
@@ -318,6 +330,25 @@ class PhotoSelectPage extends React.Component {
         });
       });
     }
+  }
+}
+
+class QueuePage extends React.Component {
+  constructor() {
+    super();
+  }
+  componentWillMount() {
+
+  }
+  render() {
+    return (
+      <View>
+        <Text style={styles.bigText}>MediaPlayer2</Text>
+        <Text style={styles.titleText}>Now playing: something</Text>
+        <View style={styles.hr} />
+        <Text style={styles.normalText}>This is the Queue</Text>
+      </View>
+    )
   }
 }
 
