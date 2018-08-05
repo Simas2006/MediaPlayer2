@@ -175,73 +175,6 @@ class NavigationPage extends React.Component {
   }
 }
 
-class PhotoSelectPage extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      picName: null,
-      warnMode: 0
-    }
-  }
-  componentWillMount() {
-    this.props.httpDevice.transmit(`OPENP /${this.props.path.join("/")}`,output => {
-      this.setState({
-        picName: output
-      });
-    });
-  }
-  render() {
-    var path = capitalizeFirstLetter(this.props.path.join("/"));
-    return (
-      <View>
-        <Title text={path} />
-        <View>
-          <Text>{"\n"}</Text>
-          <Button
-            text={"\u25c0"}
-            onPress={_ => this._movePicture("left")}
-            style={styles.largeText}
-          />
-          <Text style={styles.largeText}>{this.state.picName}</Text>
-          <Button
-            text={"\u25b6"}
-            onPress={_ => this._movePicture("right")}
-            style={styles.largeText}
-          />
-          <Text style={styles.smallWarning}>{`\n${["First Picture","","Last Picture"][this.state.warnMode + 1]}`}</Text>
-        </View>
-      </View>
-    );
-  }
-  _movePicture(direction) {
-    if ( direction == "left" ) {
-      this.props.httpDevice.transmit("PREVP",output => {
-        var warnMode = 0;
-        if ( output.endsWith("_first") ) {
-          output = output.slice(0,-6);
-          warnMode = -1;
-        }
-        this.setState({
-          picName: output,
-          warnMode: warnMode
-        });
-      });
-    } else {
-      this.props.httpDevice.transmit("NEXTP",output => {
-        var warnMode = 0;
-        if ( output.endsWith("_last") ) {
-          output = output.slice(0,-5);
-          warnMode = 1;
-        }
-        this.setState({
-          picName: output,
-          warnMode: warnMode
-        });
-      });
-    }
-  }
-}
-
 class MusicSelectPage extends React.Component {
   constructor() {
     super();
@@ -318,6 +251,73 @@ class MusicSelectPage extends React.Component {
     this.props.httpDevice.transmit(`ADDTQ /${this.props.path.join("/")} ${this.state.selected.sort((a,b) => a - b).map(item => this.props.items[item]).join(" ")}`,output => {
       this.props.setParam("component","MainPage");
     });
+  }
+}
+
+class PhotoSelectPage extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      picName: null,
+      warnMode: 0
+    }
+  }
+  componentWillMount() {
+    this.props.httpDevice.transmit(`OPENP /${this.props.path.join("/")}`,output => {
+      this.setState({
+        picName: output
+      });
+    });
+  }
+  render() {
+    var path = capitalizeFirstLetter(this.props.path.join("/"));
+    return (
+      <View>
+        <Title text={path} />
+        <View>
+          <Text>{"\n"}</Text>
+          <Button
+            text={"\u25c0"}
+            onPress={_ => this._movePicture("left")}
+            style={styles.largeText}
+          />
+          <Text style={styles.largeText}>{this.state.picName}</Text>
+          <Button
+            text={"\u25b6"}
+            onPress={_ => this._movePicture("right")}
+            style={styles.largeText}
+          />
+          <Text style={styles.smallWarning}>{`\n${["First Picture","","Last Picture"][this.state.warnMode + 1]}`}</Text>
+        </View>
+      </View>
+    );
+  }
+  _movePicture(direction) {
+    if ( direction == "left" ) {
+      this.props.httpDevice.transmit("PREVP",output => {
+        var warnMode = 0;
+        if ( output.endsWith("_first") ) {
+          output = output.slice(0,-6);
+          warnMode = -1;
+        }
+        this.setState({
+          picName: output,
+          warnMode: warnMode
+        });
+      });
+    } else {
+      this.props.httpDevice.transmit("NEXTP",output => {
+        var warnMode = 0;
+        if ( output.endsWith("_last") ) {
+          output = output.slice(0,-5);
+          warnMode = 1;
+        }
+        this.setState({
+          picName: output,
+          warnMode: warnMode
+        });
+      });
+    }
   }
 }
 
