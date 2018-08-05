@@ -1,4 +1,11 @@
-CONN                       ; Creates an authentication key to be used in place of the password. Is the first message sent to the server.
+--- Cryptography Spec ---
+All message sent between the machines must be encrypted using AES with an initialization vector.
+With the exception of the CONN command, all messages must be in the format "<client ID> <message encrypted using the authenication key>".
+The CONN command must be in the format "CONN <the text 'mp2-authentication' encrypted using the password>".
+After the DCONN command is issued, both the client ID and authentication key will be considered to be invalid.
+
+--- Command Spec ---
+CONN                       ; Creates both an authentication key and a client ID to be returned to the client to be used in place of the password in normal communications. Is the first message sent to the server. See the cryptography spec for details.
 DCONN                      ; Deathorizes a given connection. Is the last message sent to the server. Returns "ok" normally.
 LIST  <path>               ; Lists the contents of a directory.
 TYPE  <path>               ; If a directory signified by the path contains only other directories, returns "directory", otherwise, returns "file".
