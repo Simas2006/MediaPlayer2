@@ -2,7 +2,14 @@ import React from 'react';
 import {Text,ScrollView,View} from 'react-native';
 
 import {HTTPDevice} from './httpDevice'
-import {Title,Button,NavigationPage,MusicSelectPage,PhotoSelectPage,QueuePage} from './components'
+import {
+  Title,Button,
+  NavigationPage,
+  MusicSelectPage,
+  PhotoSelectPage,
+  WebPage,
+  QueuePage
+} from './components'
 
 export default class App extends React.Component {
   constructor() {
@@ -64,6 +71,18 @@ export default class App extends React.Component {
           />
         </View>
       );
+    } else if ( this.state.component == "WebPage" ) {
+      return (
+        <View>
+          <WebPage
+            path={this.state.path}
+            items={this.state.items}
+            nextComponent={this.state.nextComponent}
+            setParam={this._setParam.bind(this)}
+            httpDevice={this.httpDevice}
+          />
+        </View>
+      );
     } else if ( this.state.component == "QueuePage" ) {
       return (
         <ScrollView>
@@ -110,7 +129,7 @@ class MainPage extends React.Component {
         />
         <Button
           text="Web"
-          onPress={_ => this._openPage("web","WebSelectPage",false)}
+          onPress={_ => this._openPage("web","WebPage",false)}
           style={blueTextStyle}
         />
         <Button

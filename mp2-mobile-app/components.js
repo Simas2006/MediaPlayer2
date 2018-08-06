@@ -249,6 +249,20 @@ export class PhotoSelectPage extends React.Component {
   }
 }
 
+export class WebPage extends React.Component {
+  constructor() {
+    super();
+  }
+  render() {
+    return (
+      <View>
+        <Title text="Web" />
+        <Text style={styles.normalText}>ohi</Text>
+      </View>
+    );
+  }
+}
+
 export class QueuePage extends React.Component {
   constructor() {
     super();
