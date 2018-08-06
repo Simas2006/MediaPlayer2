@@ -98,7 +98,7 @@ class Title extends React.Component {
 class Button extends React.Component {
   render() {
     return (
-      <TouchableOpacity onPress={this.props.onPress} style={styles.fullWidth}>
+      <TouchableOpacity onPress={this.props.onPress} style={this.props.specialWidth || styles.fullWidth}>
         <Text style={this.props.style}>{this.props.text}</Text>
       </TouchableOpacity>
     );
@@ -355,29 +355,46 @@ class QueuePage extends React.Component {
         <Text style={styles.bigText}>MediaPlayer2</Text>
         <Text style={styles.titleText}>Now Playing: {this.state.queue[0] || "Nothing!"}</Text>
         <View style={styles.buttonPanel}>
-          <TouchableOpacity style={styles.thirdButton} onPress={_ =>     this.props.httpDevice.transmit("RWIND",Function.prototype)}>
-            <Text style={styles.titleText}>{"\u23ea"}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.thirdButton} onPress={_ => this._togglePlay()}>
-            <Text style={styles.boldCenterText}>{this.state.playing ? "||" : "\u25b6"}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.thirdButton} onPress={_ => this._mapCommandToQueue("PNSNG")}>
-            <Text style={styles.titleText}>{"\u23e9"}</Text>
-          </TouchableOpacity>
+          <Button
+            text={"\u23ea"}
+            onPress={_ => this.props.httpDevice.transmit("RWIND",Function.prototype)}
+            style={styles.titleText}
+            specialWidth={styles.thirdButton}
+          />
+          <Button
+            text={this.state.playing ? "||" : "\u25b6"}
+            onPress={_ => this._togglePlay()}
+            style={styles.boldCenterText}
+            specialWidth={styles.thirdButton}
+          />
+          <Button
+            text={"\u23e9"}
+            onPress={_ => this._mapCommandToQueue("PNSNG")}
+            style={styles.titleText}
+            specialWidth={styles.thirdButton}
+          />
         </View>
         <View style={styles.buttonPanel}>
-          <TouchableOpacity style={styles.thirdButton} onPress={_ => this._mapCommandToQueue("SHFLQ")}>
-            <Text style={styles.titleText}>{"\ud83d\udd00"}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.thirdButton} onPress={_ => this._mapCommandToQueue("CLRQ")}>
-            <Text style={styles.redCenterText}>X</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.thirdButton} onPress={Function.prototype}>
-            <Text style={styles.titleText}>Back</Text>
-          </TouchableOpacity>
+          <Button
+            text={"\ud83d\udd00"}
+            onPress={_ => this._mapCommandToQueue("SHFLQ")}
+            style={styles.titleText}
+            specialWidth={styles.thirdButton}
+          />
+          <Button
+            text="X"
+            onPress={_ => this._mapCommandToQueue("CLRQ")}
+            style={styles.redCenterText}
+            specialWidth={styles.thirdButton}
+          />
+          <Button
+            text="Back"
+            onPress={Function.prototype}
+            style={styles.titleText}
+            specialWidth={styles.thirdButton}
+          />
         </View>
         <View style={styles.hr} />
-        <Text style={styles.normalText}>This is the Queue</Text>
       </View>
     );
   }
