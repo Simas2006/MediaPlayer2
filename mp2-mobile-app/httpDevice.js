@@ -1,6 +1,7 @@
 export class HTTPDevice { // mock device ONLY
   constructor() {
-    this.connectionID = 91823;
+    this.connectionID = Math.floor(Math.random() * 100000);
+    this.connectionID = "0".repeat(5 - this.connectionID.toString().length) + this.connectionID;
     this.readyTick = 0;
     setInterval(_ => {
       this.readyTick = Math.max(this.readyTick - 1,0);
