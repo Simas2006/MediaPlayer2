@@ -7,7 +7,7 @@ export default class App extends React.Component {
     super();
     this.httpDevice = new HTTPDevice();
     this.state = {
-      component: "MainPage",
+      component: "QueuePage",
       path: [],
       items: [],
       nextComponent: ""
@@ -336,19 +336,46 @@ class PhotoSelectPage extends React.Component {
 class QueuePage extends React.Component {
   constructor() {
     super();
+    this.state = {
+      playing: null,
+      queue: []
+    }
   }
   componentWillMount() {
-
+    this.props.httpDevice.transmit("GETQ",output => {
+      this.setState({
+        playing: output[0] == "playing",
+        queue: output
+      });
+    });
   }
   render() {
     return (
       <View>
         <Text style={styles.bigText}>MediaPlayer2</Text>
         <Text style={styles.titleText}>Now playing: something</Text>
+        <View style={styles.buttonPanel}>
+          <TouchableOpacity style={styles.smallButton} onPress={_ => console.log("sage")}>
+            <Text style={styles.titleText}>{"\u23ea"}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.smallButton} onPress={_ => this._togglePlay()}>
+            <Text style={styles.boldCenterText}>{this.state.playing ? "||" : "\u25b6"}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.smallButton} onPress={_ => console.log("sage")}>
+            <Text style={styles.titleText}>{"\u23e9"}</Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.hr} />
         <Text style={styles.normalText}>This is the Queue</Text>
       </View>
-    )
+    );
+  }
+  _togglePlay() {
+    this.props.httpDevice.transmit("PLYPS",output => {
+      this.setState({
+        playing: ! this.state.playing
+      });
+    });
   }
 }
 
@@ -369,7 +396,6 @@ class HTTPDevice { // mock device ONLY
       callback("file");
     } else if ( message[0] == "ADDTQ" && this.readyTick <= 0 ) {
       this.readyTick = 100;
-      console.log(message.join(" "));
       callback("ok");
     } else if ( message[0] == "OPENP" ) {
       callback("0.JPG");
@@ -379,6 +405,10 @@ class HTTPDevice { // mock device ONLY
     } else if ( message[0] == "NEXTP" ) {
       this._picIndex++;
       callback(this._picIndex + ".JPG" + (this._picIndex == 10 ? "_last" : ""));
+    } else if ( message[0] == "GETQ" ) {
+      callback(["playing","somewhere/song_playing","somewhere/song1","somewhere_else/song2","somewhere/song3"]);
+    } else if ( message[0] == "PLYPS" ) {
+      callback("ok");
     }
   }
 }
@@ -416,6 +446,17 @@ var styles = StyleSheet.create({
   largeText: {
     fontSize: 40,
     textAlign: "center"
+  },
+  boldCenterText: {
+    fontSize: 25,
+    textAlign: "center",
+    fontWeight: "bold"
+  },
+  smallButton: {
+    width: "33%"
+  },
+  buttonPanel: {
+    flexDirection: "row"
   },
   hr: {
     borderBottomColor: "black",
