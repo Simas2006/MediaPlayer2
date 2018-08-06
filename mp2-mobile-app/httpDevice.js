@@ -57,6 +57,8 @@ export class HTTPDevice { // mock device ONLY
       var index = parseInt(message[1]);
       this._queue.splice(index + 1,0,this._queue.splice(index,1)[0]);
       callback([this._playingState ? "playing" : "paused"].concat(this._queue));
+    } else if ( message[0] == "HOME" ) {
+      callback("ok");
     }
   }
 }

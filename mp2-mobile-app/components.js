@@ -242,8 +242,10 @@ export class PhotoSelectPage extends React.Component {
     }
   }
   _moveBack() {
-    this.props.setParam("path",this.props.path.slice(0,-1));
-    this.props.setParam("component","NavigationPage");
+    this.props.httpDevice.transmit("HOME",output => {
+      this.props.setParam("path",this.props.path.slice(0,-1));
+      this.props.setParam("component","NavigationPage");
+    });
   }
 }
 
