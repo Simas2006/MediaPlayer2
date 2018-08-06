@@ -345,7 +345,7 @@ class QueuePage extends React.Component {
     this.props.httpDevice.transmit("GETQ",output => {
       this.setState({
         playing: output[0] == "playing",
-        queue: output
+        queue: output.slice(1)
       });
     });
   }
@@ -353,16 +353,24 @@ class QueuePage extends React.Component {
     return (
       <View>
         <Text style={styles.bigText}>MediaPlayer2</Text>
-        <Text style={styles.titleText}>Now playing: something</Text>
+        <Text style={styles.titleText}>Now Playing: {this.state.queue[0] || "Nothing!"}</Text>
         <View style={styles.buttonPanel}>
-          <TouchableOpacity style={styles.smallButton} onPress={_ => console.log("sage")}>
+          <TouchableOpacity style={styles.thirdButton} onPress={_ =>     this.props.httpDevice.transmit("RWIND",Function.prototype)}>
             <Text style={styles.titleText}>{"\u23ea"}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.smallButton} onPress={_ => this._togglePlay()}>
+          <TouchableOpacity style={styles.thirdButton} onPress={_ => this._togglePlay()}>
             <Text style={styles.boldCenterText}>{this.state.playing ? "||" : "\u25b6"}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.smallButton} onPress={_ => console.log("sage")}>
+          <TouchableOpacity style={styles.thirdButton} onPress={_ => this._mapCommandToQueue("PNSNG")}>
             <Text style={styles.titleText}>{"\u23e9"}</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.buttonPanel}>
+          <TouchableOpacity style={styles.halfButton} onPress={_ => this._mapCommandToQueue("SHFLQ")}>
+            <Text style={styles.titleText}>{"\ud83d\udd00"}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.halfButton} onPress={_ => this._mapCommandToQueue("CLRQ")}>
+            <Text style={styles.redCenterText}>X</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.hr} />
@@ -377,6 +385,13 @@ class QueuePage extends React.Component {
       });
     });
   }
+  _mapCommandToQueue(command) {
+    this.props.httpDevice.transmit(command,output => {
+      this.setState({
+        queue: output.slice(1)
+      });
+    });
+  }
 }
 
 class HTTPDevice { // mock device ONLY
@@ -387,6 +402,8 @@ class HTTPDevice { // mock device ONLY
       this.readyTick = Math.max(this.readyTick - 1,0);
     },1);
     this._picIndex = 0;
+    this._playingState = true;
+    this._queue = ["somewhere/song_playing","somewhere/song1","somewhere_else/song2","somewhere/song3"];
   }
   transmit(message,callback) {
     message = message.split(" ");
@@ -406,9 +423,22 @@ class HTTPDevice { // mock device ONLY
       this._picIndex++;
       callback(this._picIndex + ".JPG" + (this._picIndex == 10 ? "_last" : ""));
     } else if ( message[0] == "GETQ" ) {
-      callback(["playing","somewhere/song_playing","somewhere/song1","somewhere_else/song2","somewhere/song3"]);
+      callback([this._playingState ? "playing" : "paused"].concat(this._queue));
     } else if ( message[0] == "PLYPS" ) {
+      this._playingState = ! this._playingState;
       callback("ok");
+    } else if ( message[0] == "PNSNG" ) {
+      this._queue = this._queue.slice(1);
+      callback([this._playingState ? "playing" : "paused"].concat(this._queue));
+    } else if ( message[0] == "RWIND" ) {
+      callback("ok");
+    } else if ( message[0] == "CLRQ" ) {
+      this._queue = [];
+      callback([this._playingState ? "playing" : "paused"].concat(this._queue));
+    } else if ( message[0] == "SHFLQ" ) {
+      // doesn't need to be implemented here
+      this._queue.push("just/been/shuffled");
+      callback([this._playingState ? "playing" : "paused"].concat(this._queue));
     }
   }
 }
@@ -452,8 +482,16 @@ var styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "bold"
   },
-  smallButton: {
+  redCenterText: {
+    fontSize: 25,
+    color: "red",
+    textAlign: "center"
+  },
+  thirdButton: {
     width: "33%"
+  },
+  halfButton: {
+    width: "50%"
   },
   buttonPanel: {
     flexDirection: "row"
