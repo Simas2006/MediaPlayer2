@@ -42,12 +42,18 @@ export class NavigationPage extends React.Component {
           this.props.items.map((item,index) => (
             <Button
               text={item}
-              onPress={_ => this._moveForward(item)} style={styles.blueText}
+              onPress={_ => this._moveForward(item)}
+              style={styles.blueText}
               key={sha256(item).toString()}
             />
           ))
         }
         <Text>{"\n"}</Text>
+        <Button
+          text="Back"
+          onPress={_ => this._moveBack()}
+          style={styles.normalText}
+        />
       </View>
     );
   }
@@ -63,6 +69,17 @@ export class NavigationPage extends React.Component {
         this.props.setParam("component",this.props.nextComponent);
       }
     });
+  }
+  _moveBack() {
+    var path = this.props.path.slice(0,-1);
+    if ( path.length > 0 ) {
+      this.props.httpDevice.transmit(`LIST /${path.join("/")}`,output => {
+        this.props.setParam("items",output);
+        this.props.setParam("path",path);
+      });
+    } else {
+      this.props.setParam("component","MainPage");
+    }
   }
 }
 
@@ -105,6 +122,11 @@ export class MusicSelectPage extends React.Component {
           onPress={_ => this._addToQueue()}
           style={styles.normalText}
         />
+        <Button
+          text="Back"
+          onPress={_ => this._moveBack()}
+          style={styles.normalText}
+        />
       </View>
     );
   }
@@ -143,6 +165,10 @@ export class MusicSelectPage extends React.Component {
       this.props.setParam("component","MainPage");
     });
   }
+  _moveBack() {
+    this.props.setParam("path",this.props.path.slice(0,-1));
+    this.props.setParam("component","NavigationPage");
+  }
 }
 
 export class PhotoSelectPage extends React.Component {
@@ -178,7 +204,12 @@ export class PhotoSelectPage extends React.Component {
             onPress={_ => this._movePicture("right")}
             style={styles.largeText}
           />
-          <Text style={styles.smallWarning}>{`\n${["First Picture","","Last Picture"][this.state.warnMode + 1]}`}</Text>
+          <Text style={styles.smallWarning}>{`\n${["First Picture","","Last Picture"][this.state.warnMode + 1]}\n`}</Text>
+          <Button
+            text="Back"
+            onPress={_ => this._moveBack()}
+            style={styles.titleText}
+          />
         </View>
       </View>
     );
@@ -209,6 +240,10 @@ export class PhotoSelectPage extends React.Component {
         });
       });
     }
+  }
+  _moveBack() {
+    this.props.setParam("path",this.props.path.slice(0,-1));
+    this.props.setParam("component","NavigationPage");
   }
 }
 
@@ -268,7 +303,7 @@ export class QueuePage extends React.Component {
           />
           <Button
             text="Back"
-            onPress={Function.prototype}
+            onPress={_ => this.props.setParam("component","MainPage")}
             style={styles.titleText}
             specialWidth={styles.thirdButton}
           />

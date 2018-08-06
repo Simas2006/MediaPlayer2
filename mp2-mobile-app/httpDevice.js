@@ -12,9 +12,10 @@ export class HTTPDevice { // mock device ONLY
   transmit(message,callback) {
     message = message.split(" ");
     if ( message[0] == "LIST" ) {
-      callback(["foldera","folderb","folderc","folderd"]);
+      callback(["s" + message[1].split("/").join(":"),"folderb","folderc","folderd"]);
     } else if ( message[0] == "TYPE" ) {
-      callback("file");
+      if ( message[1].split("/").length <= 5 ) callback("directory");
+      else callback("file");
     } else if ( message[0] == "ADDTQ" && this.readyTick <= 0 ) {
       this.readyTick = 100;
       callback("ok");
