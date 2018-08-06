@@ -366,11 +366,14 @@ class QueuePage extends React.Component {
           </TouchableOpacity>
         </View>
         <View style={styles.buttonPanel}>
-          <TouchableOpacity style={styles.halfButton} onPress={_ => this._mapCommandToQueue("SHFLQ")}>
+          <TouchableOpacity style={styles.thirdButton} onPress={_ => this._mapCommandToQueue("SHFLQ")}>
             <Text style={styles.titleText}>{"\ud83d\udd00"}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.halfButton} onPress={_ => this._mapCommandToQueue("CLRQ")}>
+          <TouchableOpacity style={styles.thirdButton} onPress={_ => this._mapCommandToQueue("CLRQ")}>
             <Text style={styles.redCenterText}>X</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.thirdButton} onPress={Function.prototype}>
+            <Text style={styles.titleText}>Back</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.hr} />
@@ -489,9 +492,6 @@ var styles = StyleSheet.create({
   },
   thirdButton: {
     width: "33%"
-  },
-  halfButton: {
-    width: "50%"
   },
   buttonPanel: {
     flexDirection: "row"
