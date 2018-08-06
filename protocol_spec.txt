@@ -14,6 +14,9 @@ OPENP <path>               ; Opens a photo album. Returns the name of the first 
 PREVP                      ; Goes back to the previous photo. Returns the name of the photo normally, with a suffix of "_first" if the result is the first picture.
 NEXTP                      ; Goes to the next photo. Returns the name of the photo normally, with a suffix of "_last" if the result is the last picture.
 
+HOME                       ; Returns from a subpage to the default page on the server.
+WOPN  <url>                ; Opens the URL in a sandboxed browser on the server, even if a webpage is already present. Returns "ok" normally.
+
 PLYPS                      ; Plays (or pauses) the current song. Returns "ok" normally.
 PNSNG                      ; Plays the next song in the queue. If the queue is empty, will stop playing altogether. Returns the same result as GETQ.
 RWIND                      ; Rewinds the current song to position 0. Returns "ok" normally.
