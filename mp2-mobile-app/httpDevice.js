@@ -59,6 +59,8 @@ export class HTTPDevice { // mock device ONLY
       callback([this._playingState ? "playing" : "paused"].concat(this._queue));
     } else if ( message[0] == "HOME" ) {
       callback("ok");
+    } else if ( message[0] == "WOPN" ) {
+      callback("ok");
     }
   }
 }

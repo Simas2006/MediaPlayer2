@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet,TouchableOpacity,Text,View} from 'react-native';
+import {StyleSheet,TouchableOpacity,Text,TextInput,View} from 'react-native';
 import sha256 from 'crypto-js/sha256'
 
 export class Title extends React.Component {
@@ -252,14 +252,45 @@ export class PhotoSelectPage extends React.Component {
 export class WebPage extends React.Component {
   constructor() {
     super();
+    this.state = {
+      url: ""
+    }
   }
   render() {
     return (
       <View>
         <Title text="Web" />
-        <Text style={styles.normalText}>ohi</Text>
+        <Text>{"\n"}</Text>
+        <View style={styles.centerItems}>
+          <TextInput
+            keyboardType="url"
+            autoCorrect={false}
+            placeholder="Enter a URL..."
+            onChangeText={text => this.setState({url: text})}
+            style={styles.inputBox}
+          />
+          <View style={styles.buttonPanel}>
+            <Button
+              text="Go"
+              onPress={_ => this.props.httpDevice.transmit(`WOPN ${this.state.url}`,Function.prototype)}
+              style={styles.blueCenterText}
+              specialWidth={styles.halfButton}
+            />
+            <Button
+              text="Back"
+              onPress={_ => this._moveBack()}
+              style={styles.blueCenterText}
+              specialWidth={styles.halfButton}
+            />
+          </View>
+        </View>
       </View>
     );
+  }
+  _moveBack() {
+    this.props.httpDevice.transmit("HOME",output => {
+      this.props.setParam("component","MainPage");
+    });
   }
 }
 
@@ -420,10 +451,24 @@ var styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "bold"
   },
+  blueCenterText: {
+    fontSize: 25,
+    color: "blue",
+    textAlign: "center"
+  },
   redCenterText: {
     fontSize: 25,
     color: "red",
     textAlign: "center"
+  },
+  inputBox: {
+    width: "98%",
+    fontSize: 25,
+    borderWidth: 1,
+    borderColor: "black"
+  },
+  halfButton: {
+    width: "50%"
   },
   thirdButton: {
     width: "33%"
@@ -433,6 +478,9 @@ var styles = StyleSheet.create({
   },
   buttonPanel: {
     flexDirection: "row"
+  },
+  centerItems: {
+    alignItems: "center"
   },
   hr: {
     borderBottomColor: "black",
