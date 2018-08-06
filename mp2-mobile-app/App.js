@@ -395,6 +395,43 @@ class QueuePage extends React.Component {
           />
         </View>
         <View style={styles.hr} />
+        <View>
+          {
+            this.state.queue.slice(1).map((item,index) => {
+              return (
+                <View key={sha256(item + Math.random())}> // im sorry
+                  <Text style={styles.normalText}>{item}</Text>
+                  <View style={styles.buttonPanel}>
+                    <Button
+                      text={"\u2912"}
+                      onPress={_ => this._mapCommandToQueue(`UPSQ ${index + 1} true`)}
+                      style={styles.titleText}
+                      specialWidth={styles.quarterButton}
+                    />
+                    <Button
+                      text={"\u2191"}
+                      onPress={_ => this._mapCommandToQueue(`UPSQ ${index + 1} false`)}
+                      style={styles.titleText}
+                      specialWidth={styles.quarterButton}
+                    />
+                    <Button
+                      text={"\u2193"}
+                      onPress={_ => this._mapCommandToQueue(`DWNSQ ${index + 1}`)}
+                      style={styles.titleText}
+                      specialWidth={styles.quarterButton}
+                    />
+                    <Button
+                      text="X"
+                      onPress={_ => this._mapCommandToQueue("CLRQ")}
+                      style={styles.redCenterText}
+                      specialWidth={styles.quarterButton}
+                    />
+                  </View>
+                </View>
+              );
+            })
+          }
+        </View>
       </View>
     );
   }
@@ -423,7 +460,7 @@ class HTTPDevice { // mock device ONLY
     },1);
     this._picIndex = 0;
     this._playingState = true;
-    this._queue = ["somewhere/song_playing","somewhere/song1","somewhere_else/song2","somewhere/song3"];
+    this._queue = ["somewhere/song_playing","somewhere/song1","somewhere/song1","somewhere_else/song3"];
   }
   transmit(message,callback) {
     message = message.split(" ");
@@ -458,6 +495,19 @@ class HTTPDevice { // mock device ONLY
     } else if ( message[0] == "SHFLQ" ) {
       // doesn't need to be implemented here
       this._queue.push("just/been/shuffled");
+      callback([this._playingState ? "playing" : "paused"].concat(this._queue));
+    } else if ( message[0] == "UPSQ" ) {
+      var index = parseInt(message[1]);
+      if ( index <= 1 ) {
+        callback([this._playingState ? "playing" : "paused"].concat(this._queue));
+      } else {
+        var toIndex = message[2] == "true" ? 1 : index - 1
+        this._queue.splice(toIndex,0,this._queue.splice(index,1)[0]);
+        callback([this._playingState ? "playing" : "paused"].concat(this._queue));
+      }
+    } else if ( message[0] == "DWNSQ" ) {
+      var index = parseInt(message[1]);
+      this._queue.splice(index + 1,0,this._queue.splice(index,1)[0]);
       callback([this._playingState ? "playing" : "paused"].concat(this._queue));
     }
   }
@@ -509,6 +559,9 @@ var styles = StyleSheet.create({
   },
   thirdButton: {
     width: "33%"
+  },
+  quarterButton: {
+    width: "25%"
   },
   buttonPanel: {
     flexDirection: "row"
