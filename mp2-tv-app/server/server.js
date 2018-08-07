@@ -123,7 +123,7 @@ app.get("/blank",function(request,response) {
   response.send("hi");
 });
 
-var DEBUG_MODE_TEXT = "LIST /music/havanese";
+var DEBUG_MODE_TEXT = null;
 if ( DEBUG_MODE_TEXT ) {
   var cg = new Cryptographer();
   AUTH_KEY = cg.generateKey("password");

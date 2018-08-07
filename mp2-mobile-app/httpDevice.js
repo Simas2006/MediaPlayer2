@@ -80,8 +80,18 @@ export default class HTTPDevice {
         callback(false);
       } else {
         this.authKey = cg.decrypt(output.split(" ")[1],cg.generateKey(password));
+        this.connectionID = Math.floor(Math.random() * 100000);
+        this.connectionID = "0".repeat(5 - this.connectionID.toString().length) + this.connectionID;
         callback(true);
       }
     },true);
+  }
+  disconnect(callback) {
+    this.transmit("DCONN",_ => {
+      this.connectionID = null;
+      this.address = null;
+      this.authKey = null;
+      callback();
+    });
   }
 }
