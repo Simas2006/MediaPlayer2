@@ -93,6 +93,22 @@ app.post("/receive",function(request,response) {
             if ( err && err.code != "ENOENT" ) throw err;
             fs.writeFile(__dirname + "/inputCmd",text.join(" "),function(err) {
               if ( err ) throw err;
+              var interval = setInterval(function() {
+                fs.readFile(__dirname + "/outputCmd",function(err,data) {
+                  if ( err ) {
+                    if ( err.code == "ENOENT" ) return;
+                    else throw err;
+                  }
+                  fs.unlink(__dirname + "/outputCmd",function(err) {
+                    if ( err ) throw err;
+                    fs.unlink(__dirname + "/inputCmd",function(err) {
+                      if ( err ) throw err;
+                      response.send(data.toString().trim());
+                    });
+                  });
+                  clearInterval(interval);
+                });
+              },50);
             });
           });
         }
