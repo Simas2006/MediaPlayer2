@@ -190,21 +190,23 @@ class LoginPage extends React.Component {
       <View>
         <Title text="Login" />
         <Text>{"\n"}</Text>
-        <TextInput
-          keyboardType="number-pad"
-          autoCorrect={false}
-          placeholder="Server #"
-          onChangeText={text => this.setState({id: parseInt(text)})}
-          style={styles.inputBox}
-        />
-        <TextInput
-          keyboardType="default"
-          autoCorrect={false}
-          secureTextEntry={true}
-          placeholder="Password"
-          onChangeText={text => this.setState({password: text})}
-          style={styles.inputBox}
-        />
+        <View style={styles.centerItems}>
+          <TextInput
+            keyboardType="number-pad"
+            autoCorrect={false}
+            placeholder="Server #"
+            onChangeText={text => this.setState({id: parseInt(text)})}
+            style={styles.inputBox}
+          />
+          <TextInput
+            keyboardType="default"
+            autoCorrect={false}
+            secureTextEntry={true}
+            placeholder="Password"
+            onChangeText={text => this.setState({password: text})}
+            style={styles.inputBox}
+          />
+        </View>
         <Button
           text="Go"
           onPress={_ => this._login()}
