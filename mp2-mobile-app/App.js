@@ -1,5 +1,5 @@
 import React from 'react';
-import {Alert,Text,ScrollView,View} from 'react-native';
+import {Alert,Text,TextInput,ScrollView,View} from 'react-native';
 
 import HTTPDevice from './httpDevice'
 import {
@@ -17,7 +17,7 @@ export default class App extends React.Component {
     super();
     this.httpDevice = new HTTPDevice();
     this.state = {
-      component: "MainPage",
+      component: "LoginPage",
       path: [],
       items: [],
       nextComponent: ""
@@ -38,7 +38,7 @@ export default class App extends React.Component {
       );
     } else if ( this.state.component == "LoginPage" ) {
       return (
-        <ScrollView>
+        <View>
           <LoginPage
             path={this.state.path}
             items={this.state.items}
@@ -46,7 +46,7 @@ export default class App extends React.Component {
             setParam={this._setParam.bind(this)}
             httpDevice={this.httpDevice}
           />
-        </ScrollView>
+        </View>
       );
     } else if ( this.state.component == "NavigationPage" ) {
       return (
@@ -165,8 +165,8 @@ class MainPage extends React.Component {
       "MediaPlayer2",
       "Are you sure you want to disconnect?",
       [
-        {text: "Cancel", onPress: Function.prototype, style: "cancel"},
-        {text: "OK", onPress: _ => {
+        {text: "Cancel",onPress: Function.prototype,style: "cancel"},
+        {text: "OK",onPress: _ => {
           this.props.httpDevice.disconnect(_ => {
             this.props.setParam("component","LoginPage");
           });
@@ -180,8 +180,53 @@ class MainPage extends React.Component {
 class LoginPage extends React.Component {
   constructor() {
     super();
+    this.state = {
+      id: null,
+      password: ""
+    }
   }
   render() {
-    return null;
+    return (
+      <View>
+        <Title text="Login" />
+        <Text>{"\n"}</Text>
+        <TextInput
+          keyboardType="number-pad"
+          autoCorrect={false}
+          placeholder="Server #"
+          onChangeText={text => this.setState({id: parseInt(text)})}
+          style={styles.inputBox}
+        />
+        <TextInput
+          keyboardType="default"
+          autoCorrect={false}
+          secureTextEntry={true}
+          placeholder="Password"
+          onChangeText={text => this.setState({password: text})}
+          style={styles.inputBox}
+        />
+        <Button
+          text="Go"
+          onPress={_ => this._login()}
+          style={styles.blueCenterText}
+        />
+      </View>
+    );
+  }
+  _login() {
+    this.props.httpDevice.connect(this.state.id,this.state.password,valid => {
+      if ( valid ) {
+        this.props.setParam("component","MainPage");
+      } else {
+        Alert.alert(
+          "MediaPlayer2",
+          "Invalid server ID or password.",
+          [
+            {text: "OK",onPress: Function.prototype,style: "cancel"}
+          ],
+          {cancelable: false}
+        );
+      }
+    })
   }
 }

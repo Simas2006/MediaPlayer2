@@ -69,6 +69,21 @@ export default class HTTPDevice { // mock device ONLY
       callback("ok");
     }
   }
+  connect(id,password,callback) {
+    if ( ! id || ! password ) {
+      callback(false);
+      return;
+    }
+    var address = `${IP_PREFIX}${id}:${PORT}`;
+    // initialize variables, fire CONN, etc.
+    if ( id == 118 && password == "password" ) {
+      this.connectionID = Math.floor(Math.random() * 100000);
+      this.connectionID = "0".repeat(5 - this.connectionID.toString().length) + this.connectionID;
+      callback(true);
+    } else {
+      callback(false);
+    }
+  }
   disconnect(callback) {
     this.transmit("DCONN",output => {
       // purge variables, etc.
