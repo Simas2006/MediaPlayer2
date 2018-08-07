@@ -7,5 +7,9 @@
     "test": "electron ."
   },
   "author": "Simas Juknelis",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "electron": "^2.0.6",
+    "express": "^4.16.3"
+  }
 }
