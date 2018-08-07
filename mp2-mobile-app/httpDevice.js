@@ -1,94 +1,87 @@
+import CryptoJS from 'crypto-js'
+
 const IP_PREFIX = "10.0.1.";
 const PORT      = 5600;
 
-export default class HTTPDevice { // mock device ONLY
+class Cryptographer {
+  encrypt(message,key) {
+    key = CryptoJS.enc.Base64.parse(key);
+    var iv = CryptoJS.lib.WordArray.random(32);
+    var encrypted = CryptoJS.AES.encrypt(
+      message.toString(CryptoJS.enc.Base64),
+      key,
+      {iv}
+    );
+    return [
+      encrypted.ciphertext.toString(CryptoJS.enc.Base64),
+      iv.toString(CryptoJS.enc.Base64)
+    ].join(":");
+  }
+  decrypt(message,key) {
+    try {
+      key = CryptoJS.enc.Base64.parse(key);
+      var decrypted = CryptoJS.AES.decrypt(
+        message.split(":")[0],
+        key,
+        {iv: CryptoJS.enc.Base64.parse(message.split(":")[1])}
+      );
+      return decrypted.toString(CryptoJS.enc.Utf8);
+    } catch ( err ) {
+      return "decrypt-failed";
+    }
+  }
+  generateKey(passphrase) {
+    if ( passphrase ) return passphrase + "/".repeat(32 - passphrase.length);
+    else return CryptoJS.lib.WordArray.random(32).toString(CryptoJS.enc.Base64);
+  }
+}
+
+export default class HTTPDevice {
   constructor() {
-    this.connectionID = Math.floor(Math.random() * 100000);
-    this.connectionID = "0".repeat(5 - this.connectionID.toString().length) + this.connectionID;
+    this.connectionID = null;
+    this.address = null;
+    this.authKey = null;
     this.readyTick = 0;
     setInterval(_ => {
       this.readyTick = Math.max(this.readyTick - 1,0);
     },1);
-    this._picIndex = 0;
-    this._playingState = true;
-    this._queue = ["somewhere/song_playing","somewhere/song1","somewhere/song1","somewhere_else/song3"];
   }
-  transmit(message,callback) {
-    message = message.split(" ");
-    if ( message[0] == "LIST" ) {
-      callback(["s" + message[1].split("/").join(":"),"folderb","folderc","folderd"]);
-    } else if ( message[0] == "TYPE" ) {
-      if ( message[1].split("/").length <= 5 ) callback("directory");
-      else callback("file");
-    } else if ( message[0] == "ADDTQ" && this.readyTick <= 0 ) {
-      this.readyTick = 100;
-      callback("ok");
-    } else if ( message[0] == "OPENP" ) {
-      callback("0.JPG");
-    } else if ( message[0] == "PREVP" ) {
-      this._picIndex--;
-      callback(this._picIndex + ".JPG" + (this._picIndex == 0 ? "_first" : ""));
-    } else if ( message[0] == "NEXTP" ) {
-      this._picIndex++;
-      callback(this._picIndex + ".JPG" + (this._picIndex == 10 ? "_last" : ""));
-    } else if ( message[0] == "GETQ" ) {
-      callback([this._playingState ? "playing" : "paused"].concat(this._queue));
-    } else if ( message[0] == "PLYPS" ) {
-      this._playingState = ! this._playingState;
-      callback("ok");
-    } else if ( message[0] == "PNSNG" ) {
-      this._queue = this._queue.slice(1);
-      callback([this._playingState ? "playing" : "paused"].concat(this._queue));
-    } else if ( message[0] == "RWIND" ) {
-      callback("ok");
-    } else if ( message[0] == "CLRQ" ) {
-      this._queue = [];
-      callback([this._playingState ? "playing" : "paused"].concat(this._queue));
-    } else if ( message[0] == "SHFLQ" ) {
-      // doesn't need to be implemented here
-      this._queue.push("just/been/shuffled");
-      callback([this._playingState ? "playing" : "paused"].concat(this._queue));
-    } else if ( message[0] == "UPSQ" ) {
-      var index = parseInt(message[1]);
-      if ( index <= 1 ) {
-        callback([this._playingState ? "playing" : "paused"].concat(this._queue));
+  transmit(message,callback,rawMode) {
+    var cg = new Cryptographer();
+    var req = new XMLHttpRequest();
+    req.open("POST",`http://${this.address}/receive`);
+    var authKey = this.authKey;
+    req.onload = function() {
+      if ( rawMode ) {
+        callback(this.responseText);
       } else {
-        var toIndex = message[2] == "true" ? 1 : index - 1
-        this._queue.splice(toIndex,0,this._queue.splice(index,1)[0]);
-        callback([this._playingState ? "playing" : "paused"].concat(this._queue));
+        if ( this.responseText == "ok" || this.responseText == "error" ) {
+          callback(this.responseText);
+        } else {
+          var plaintext = cg.decrypt(this.responseText,authKey);
+          if ( plaintext.split(",").length > 1 || plaintext == "playing" || plaintext == "paused" ) callback(plaintext.split(","));
+          else callback(plaintext);
+        }
       }
-    } else if ( message[0] == "DWNSQ" ) {
-      var index = parseInt(message[1]);
-      this._queue.splice(index + 1,0,this._queue.splice(index,1)[0]);
-      callback([this._playingState ? "playing" : "paused"].concat(this._queue));
-    } else if ( message[0] == "HOME" ) {
-      callback("ok");
-    } else if ( message[0] == "WOPN" ) {
-      callback("ok");
-    } else if ( message[0] == "DCONN" ) {
-      callback("ok");
     }
+    if ( rawMode ) req.send(message);
+    else req.send(cg.encrypt(message,this.authKey));
   }
   connect(id,password,callback) {
     if ( ! id || ! password ) {
       callback(false);
       return;
     }
-    var address = `${IP_PREFIX}${id}:${PORT}`;
-    // initialize variables, fire CONN, etc.
-    if ( id == 118 && password == "password" ) {
-      this.connectionID = Math.floor(Math.random() * 100000);
-      this.connectionID = "0".repeat(5 - this.connectionID.toString().length) + this.connectionID;
-      callback(true);
-    } else {
-      callback(false);
-    }
-  }
-  disconnect(callback) {
-    this.transmit("DCONN",output => {
-      // purge variables, etc.
-      console.log("disconnect fired");
-      callback();
-    });
+    this.address = `${IP_PREFIX}${id}:${PORT}`;
+    var cg = new Cryptographer();
+    var encrypted = cg.encrypt("mp2-authentication",cg.generateKey(password));
+    this.transmit("CONN " + encrypted,output => {
+      if ( output == "error" ) {
+        callback(false);
+      } else {
+        this.authKey = cg.decrypt(output.split(" ")[1],cg.generateKey(password));
+        callback(true);
+      }
+    },true);
   }
 }

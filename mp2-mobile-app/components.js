@@ -31,6 +31,7 @@ export class NavigationPage extends React.Component {
   }
   componentWillMount() {
     this.props.httpDevice.transmit(`LIST /${this.props.path.join("/")}`,output => {
+      console.log(output);
       this.props.setParam("items",output);
     });
   }
