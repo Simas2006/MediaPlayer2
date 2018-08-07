@@ -222,7 +222,7 @@ class LoginPage extends React.Component {
       } else {
         Alert.alert(
           "MediaPlayer2",
-          "Invalid server ID or password.",
+          "Invalid server ID or password or server is already connected to another device.",
           [
             {text: "OK",onPress: Function.prototype,style: "cancel"}
           ],
