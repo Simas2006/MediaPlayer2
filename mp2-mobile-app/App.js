@@ -10,6 +10,7 @@ import {
   WebPage,
   QueuePage
 } from './components'
+import styles from './stylesheet'
 
 export default class App extends React.Component {
   constructor() {
@@ -109,10 +110,6 @@ class MainPage extends React.Component {
     super();
   }
   render() {
-    var blueTextStyle = {
-      fontSize: 25,
-      color: "blue"
-    }
     return (
       <View>
         <Title text="Home" />
@@ -120,24 +117,23 @@ class MainPage extends React.Component {
         <Button
           text="Music"
           onPress={_ => this._openPage("music","MusicSelectPage",true)}
-          style={blueTextStyle}
+          style={styles.blueText}
         />
         <Button
           text="Photos"
           onPress={_ => this._openPage("photos","PhotoSelectPage",true)}
-          style={blueTextStyle}
+          style={styles.blueText}
         />
         <Button
           text="Web"
           onPress={_ => this._openPage("web","WebPage",false)}
-          style={blueTextStyle}
+          style={styles.blueText}
         />
         <Button
           text="Queue"
           onPress={_ => this._openPage("queue","QueuePage",false)}
-          style={blueTextStyle}
+          style={styles.blueText}
         />
-        <Text>{`\nCurrently connected with ID ${this.props.httpDevice.connectionID}`}</Text>
       </View>
     );
   }
