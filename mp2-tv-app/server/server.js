@@ -60,8 +60,6 @@ class Cryptographer {
   }
 }
 
-AUTH_KEY = new Cryptographer().generateKey("havanese");
-
 app.post("/receive",function(request,response) {
   var data = "";
   request.on("data",function(chunk) {
@@ -86,7 +84,10 @@ app.post("/receive",function(request,response) {
         response.send("error");
       } else {
         text = text.split(" ");
-        if ( COMMANDS.indexOf(text[0]) <= -1 ) {
+        if ( text[0] == "DCONN" ) {
+          AUTH_KEY = null;
+          response.send("ok");
+        } else if ( COMMANDS.indexOf(text[0]) <= -1 ) {
           response.send("error");
         } else {
           fs.unlink(__dirname + "/outputCmd",function(err) {
@@ -123,6 +124,4 @@ app.get("/blank",function(request,response) {
 
 app.listen(PORT,function() {
   console.log("Listening on port " + PORT);
-  var cg = new Cryptographer();
-  console.log(cg.encrypt("LIST /music/havanese",AUTH_KEY));
 });
