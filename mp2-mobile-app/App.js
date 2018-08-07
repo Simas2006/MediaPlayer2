@@ -12,6 +12,9 @@ import {
 } from './components'
 import styles from './stylesheet'
 
+const IP_PREFIX = "10.0.1.";
+const PORT      = 5600;
+
 export default class App extends React.Component {
   constructor() {
     super();
@@ -133,6 +136,12 @@ class MainPage extends React.Component {
           text="Queue"
           onPress={_ => this._openPage("queue","QueuePage",false)}
           style={styles.blueText}
+        />
+        <Text>{`\n\nCurrently connected with ID ${this.props.httpDevice.connectionID}`}</Text>
+        <Button
+          text="Disconnect"
+          onPress={_ => console.log("do a confirmation")}
+          style={styles.redSmallText}
         />
       </View>
     );

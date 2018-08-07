@@ -51,6 +51,9 @@ var styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "black"
   },
+  redSmallText: {
+    color: "red"
+  },
   halfButton: {
     width: "50%"
   },
