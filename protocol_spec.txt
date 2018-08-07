@@ -1,5 +1,5 @@
 --- Cryptography Spec ---
-All message sent to the server must be encrypted using AES with an initialization vector.
+All message sent to the server must be encrypted using AES with an initialization vector. Messages returned from the server must be encrypted unless their contents are "ok" or "error".
 The CONN command must be in the plaintext format "CONN <the text 'mp2-authentication' encrypted using the password>".
 After the DCONN command is issued, the authentication key will be considered to be invalid until it is reused with a CONN command.
 

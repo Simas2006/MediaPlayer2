@@ -103,7 +103,9 @@ app.post("/receive",function(request,response) {
                     if ( err ) throw err;
                     fs.unlink(__dirname + "/inputCmd",function(err) {
                       if ( err ) throw err;
-                      response.send(data.toString().trim());
+                      data = data.toString().trim();
+                      if ( data == "ok" || data == "error" ) response.send(data);
+                      else response.send(cg.encrypt(data,AUTH_KEY));
                     });
                   });
                   clearInterval(interval);
@@ -120,6 +122,14 @@ app.post("/receive",function(request,response) {
 app.get("/blank",function(request,response) {
   response.send("hi");
 });
+
+var DEBUG_MODE_TEXT = "LIST /music/havanese";
+if ( DEBUG_MODE_TEXT ) {
+  var cg = new Cryptographer();
+  AUTH_KEY = cg.generateKey("password");
+  console.log("!!! WARNING: DEBUG MODE IS ENABLED !!!");
+  console.log(`Encrypted "${DEBUG_MODE_TEXT}" = "${cg.encrypt(DEBUG_MODE_TEXT,AUTH_KEY)}"`);
+}
 
 app.listen(PORT,function() {
   console.log("Listening on port " + PORT);
