@@ -1,7 +1,7 @@
 import React from 'react';
-import {Text,ScrollView,View} from 'react-native';
+import {Alert,Text,ScrollView,View} from 'react-native';
 
-import {HTTPDevice} from './httpDevice'
+import HTTPDevice from './httpDevice'
 import {
   Title,Button,
   NavigationPage,
@@ -11,9 +11,6 @@ import {
   QueuePage
 } from './components'
 import styles from './stylesheet'
-
-const IP_PREFIX = "10.0.1.";
-const PORT      = 5600;
 
 export default class App extends React.Component {
   constructor() {
@@ -38,6 +35,18 @@ export default class App extends React.Component {
             httpDevice={this.httpDevice}
           />
         </View>
+      );
+    } else if ( this.state.component == "LoginPage" ) {
+      return (
+        <ScrollView>
+          <LoginPage
+            path={this.state.path}
+            items={this.state.items}
+            nextComponent={this.state.nextComponent}
+            setParam={this._setParam.bind(this)}
+            httpDevice={this.httpDevice}
+          />
+        </ScrollView>
       );
     } else if ( this.state.component == "NavigationPage" ) {
       return (
@@ -140,7 +149,7 @@ class MainPage extends React.Component {
         <Text>{`\n\nCurrently connected with ID ${this.props.httpDevice.connectionID}`}</Text>
         <Button
           text="Disconnect"
-          onPress={_ => console.log("do a confirmation")}
+          onPress={_ => this._disconnect()}
           style={styles.redSmallText}
         />
       </View>
@@ -150,5 +159,29 @@ class MainPage extends React.Component {
     this.props.setParam("nextComponent",componentName);
     this.props.setParam("path",[page]);
     this.props.setParam("component",navPage ? "NavigationPage" : componentName);
+  }
+  _disconnect() {
+    Alert.alert(
+      "MediaPlayer2",
+      "Are you sure you want to disconnect?",
+      [
+        {text: "Cancel", onPress: Function.prototype, style: "cancel"},
+        {text: "OK", onPress: _ => {
+          this.props.httpDevice.disconnect(_ => {
+            this.props.setParam("component","LoginPage");
+          });
+        }},
+      ],
+      {cancelable: false}
+    );
+  }
+}
+
+class LoginPage extends React.Component {
+  constructor() {
+    super();
+  }
+  render() {
+    return null;
   }
 }

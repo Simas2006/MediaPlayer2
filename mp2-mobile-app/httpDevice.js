@@ -1,4 +1,7 @@
-export class HTTPDevice { // mock device ONLY
+const IP_PREFIX = "10.0.1.";
+const PORT      = 5600;
+
+export default class HTTPDevice { // mock device ONLY
   constructor() {
     this.connectionID = Math.floor(Math.random() * 100000);
     this.connectionID = "0".repeat(5 - this.connectionID.toString().length) + this.connectionID;
@@ -62,6 +65,15 @@ export class HTTPDevice { // mock device ONLY
       callback("ok");
     } else if ( message[0] == "WOPN" ) {
       callback("ok");
+    } else if ( message[0] == "DCONN" ) {
+      callback("ok");
     }
+  }
+  disconnect(callback) {
+    this.transmit("DCONN",output => {
+      // purge variables, etc.
+      console.log("disconnect fired");
+      callback();
+    });
   }
 }
