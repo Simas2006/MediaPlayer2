@@ -52,9 +52,9 @@ function validateCommand(command,callback) {
     "SHFLQ": 1
   }
   var commandName = command[0];
-  if ( paramCount[commandName] && (paramCount[commandName] == command.length || (paramCount[commandName] == 4 && command.length >= 4)) ) {
+  if ( paramCount[commandName] && (paramCount[commandName] == command.length || (paramCount[commandName] == 4 && command.length >= 3)) ) {
     command = command.map(item => decodeURIComponent(item));
-    if ( commandName == "LIST" || commandName == "TYPE" ) {
+    if ( commandName == "LIST" || commandName == "TYPE" || commandName == "OPENP" ) {
       fs.stat(DATA_LOC + "/" + command[1],function(err,stats) {
         if ( err ) {
           if ( err.code == "ENOENT" ) {
@@ -66,6 +66,24 @@ function validateCommand(command,callback) {
         }
         if ( stats.isDirectory() ) callback(true);
         else callback(false);
+      });
+    } else if ( commandName == "ADDTQ" ) {
+      fs.readdir(DATA_LOC + "/" + command[1],function(err,files) {
+        if ( err ) {
+          if ( err.code == "ENOENT" || err.code == "ENOTDIR" ) {
+            callback(false);
+            return;
+          } else {
+            throw err;
+          }
+        }
+        for ( var i = 2; i < command.length; i++ ) {
+          if ( files.indexOf(command[i]) <= -1 ) {
+            callback(false);
+            return;
+          }
+        }
+        callback(true);
       });
     }
   } else {
