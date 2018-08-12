@@ -59,8 +59,8 @@ export class NavigationPage extends React.Component {
     );
   }
   _moveForward(item) {
+    this.props.path.push(item);
     this.props.httpDevice.transmit(["TYPE",`/${this.props.path.join("/")}`],output => {
-      this.props.path.push(item);
       if ( output == "directory" ) {
         this.props.httpDevice.transmit(["LIST",`/${this.props.path.join("/")}`],output => {
           this.props.setParam("items",output);
