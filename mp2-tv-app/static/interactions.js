@@ -15,7 +15,7 @@ function checkForCommand(handlers) {
     }
     data = data.toString().trim().split(" ");
     var textToWrite;
-    callback(command,function(valid) {
+    validateCommand(data,function(valid) {
       if ( valid ) {
         parseCommand(data,handlers,function(toWrite) {
           fs.writeFile(__dirname + "/../server/outputCmd",toWrite,function(err) {
@@ -98,5 +98,23 @@ function validateCommand(command,callback) {
 }
 
 function parseCommand(command,handlers,callback) {
-
+  command = command.map(item => decodeURIComponent(item));
+  var commandName = command[0];
+  if ( commandName == "LIST" ) {
+    fs.readdir(DATA_LOC + "/" + command[1],function(err,files) {
+      if ( err ) throw err;
+      callback(files.filter(item => ! item.startsWith(".")).join(","));
+    });
+  } else if ( commandName == "TYPE" ) {
+    fs.readdir(DATA_LOC + "/" + command[1],function(err,files) {
+      if ( err ) throw err;
+      for ( var i = 0; i < files.length; i++ ) {
+        if ( files[i].charAt(files[i].length - 4) == "." ) {
+          callback("file");
+          return;
+        }
+      }
+      callback("directory");
+    });
+  }
 }
