@@ -85,6 +85,12 @@ function validateCommand(command,callback) {
         }
         callback(true);
       });
+    } else if ( commandName == "UPSQ" || commandName == "DWNSQ" || commandName == "DELSQ" ) {
+      if ( commandName == "UPSQ" && ["true","false"].indexOf(command[2]) <= -1 ) {
+        callback(false);
+        return;
+      }
+      callback(! isNaN(parseInt(command[1])));
     }
   } else {
     callback(false);
