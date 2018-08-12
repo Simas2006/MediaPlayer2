@@ -1,4 +1,5 @@
 var fs = require("fs");
+var DATA_LOC = __dirname + "/../data";
 
 function initCommandHandling(handlers) {
   setInterval(function() {
@@ -32,26 +33,43 @@ function checkForCommand(handlers) {
 
 function validateCommand(command,callback) {
   var paramCount = {
-    "LIST" : 1,
-    "TYPE" : 1,
-    "ADDTQ": 3,
-    "OPENP": 1,
-    "PREVP": 0,
-    "NEXTP": 0,
-    "HOME" : 0,
-    "WOPN" : 1,
-    "PLYPS": 0,
-    "PNSNG": 0,
-    "RWIND": 0,
-    "GETQ" : 0,
-    "UPSQ" : 2,
-    "DWNSQ": 1,
-    "DELSQ": 1,
-    "CLRQ" : 0,
-    "SHFLQ": 0
+    "LIST" : 2,
+    "TYPE" : 2,
+    "ADDTQ": 4,
+    "OPENP": 2,
+    "PREVP": 1,
+    "NEXTP": 1,
+    "HOME" : 1,
+    "WOPN" : 2,
+    "PLYPS": 1,
+    "PNSNG": 1,
+    "RWIND": 1,
+    "GETQ" : 1,
+    "UPSQ" : 3,
+    "DWNSQ": 2,
+    "DELSQ": 2,
+    "CLRQ" : 1,
+    "SHFLQ": 1
   }
-  if ( paramCount[command[0]] != command.length - 1 && paramCount[command[0]] != 3 ) {
-    console.log("NO");
+  var commandName = command[0];
+  if ( paramCount[commandName] && (paramCount[commandName] == command.length || (paramCount[commandName] == 4 && command.length >= 4)) ) {
+    command = command.map(item => decodeURIComponent(item));
+    if ( commandName == "LIST" || commandName == "TYPE" ) {
+      fs.stat(DATA_LOC + "/" + command[1],function(err,stats) {
+        if ( err ) {
+          if ( err.code == "ENOENT" ) {
+            callback(false);
+            return;
+          } else {
+            throw err;
+          }
+        }
+        if ( stats.isDirectory() ) callback(true);
+        else callback(false);
+      });
+    }
+  } else {
+    callback(false);
   }
 }
 
