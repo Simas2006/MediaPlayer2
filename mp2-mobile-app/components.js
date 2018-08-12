@@ -19,7 +19,7 @@ export class Button extends React.Component {
   render() {
     return (
       <TouchableOpacity onPress={this.props.onPress} style={this.props.specialWidth || styles.fullWidth}>
-        <Text style={this.props.style}>{this.props.text}</Text>
+        <Text style={this.props.style} numberOfLines={1}>{this.props.text}</Text>
       </TouchableOpacity>
     );
   }
