@@ -59,7 +59,7 @@ export default class HTTPDevice {
           callback(this.responseText);
         } else {
           var plaintext = cg.decrypt(this.responseText,authKey);
-          if ( plaintext.split(",").length > 1 ) callback(plaintext.split(",").filter(item => item));
+          if ( plaintext.split(",").length > 1 ) callback(plaintext.split(",").filter(item => item).map(item => decodeURIComponent(item)));
           else callback(plaintext);
         }
       }

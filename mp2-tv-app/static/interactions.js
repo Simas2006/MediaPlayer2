@@ -13,12 +13,11 @@ function checkForCommand(handlers) {
       if ( err.code == "ENOENT" ) return;
       else throw err;
     }
-    data = data.toString().trim().split(" ");
-    var textToWrite;
+    data = data.toString().trim().split(" ").map(item => decodeURIComponent(item));
     validateCommand(data,function(valid) {
       if ( valid ) {
         parseCommand(data,handlers,function(toWrite) {
-          fs.writeFile(__dirname + "/../server/outputCmd",toWrite,function(err) {
+          fs.writeFile(__dirname + "/../server/outputCmd",toWrite.map(item => encodeURIComponent(item)).join(","),function(err) {
             if ( err ) throw err;
           });
         });
@@ -53,7 +52,6 @@ function validateCommand(command,callback) {
   }
   var commandName = command[0];
   if ( paramCount[commandName] && (paramCount[commandName] == command.length || (paramCount[commandName] == 4 && command.length >= 3)) ) {
-    command = command.map(item => decodeURIComponent(item));
     if ( commandName == "LIST" || commandName == "TYPE" || commandName == "OPENP" ) {
       fs.stat(DATA_LOC + "/" + command[1],function(err,stats) {
         if ( err ) {
@@ -98,23 +96,22 @@ function validateCommand(command,callback) {
 }
 
 function parseCommand(command,handlers,callback) {
-  command = command.map(item => decodeURIComponent(item));
   var commandName = command[0];
   if ( commandName == "LIST" ) {
     fs.readdir(DATA_LOC + "/" + command[1],function(err,files) {
       if ( err ) throw err;
-      callback(files.filter(item => ! item.startsWith(".")).join(","));
+      callback(files.filter(item => ! item.startsWith(".")));
     });
   } else if ( commandName == "TYPE" ) {
     fs.readdir(DATA_LOC + "/" + command[1],function(err,files) {
       if ( err ) throw err;
       for ( var i = 0; i < files.length; i++ ) {
         if ( files[i].charAt(files[i].length - 4) == "." ) {
-          callback("file");
+          callback(["file"]);
           return;
         }
       }
-      callback("directory");
+      callback(["directory"]);
     });
   }
 }
