@@ -59,7 +59,7 @@ export default class HTTPDevice {
           callback(this.responseText);
         } else {
           var plaintext = cg.decrypt(this.responseText,authKey);
-          if ( plaintext.split(",").length > 1 || plaintext == "playing" || plaintext == "paused" ) callback(plaintext.split(","));
+          if ( plaintext.split(",").length > 1 ) callback(plaintext.split(",").filter(item => item));
           else callback(plaintext);
         }
       }
