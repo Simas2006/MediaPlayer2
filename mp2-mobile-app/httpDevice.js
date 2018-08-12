@@ -65,7 +65,7 @@ export default class HTTPDevice {
       }
     }
     if ( rawMode ) req.send(message);
-    else req.send(cg.encrypt(message,this.authKey));
+    else req.send(cg.encrypt(message.map(item => encodeURIComponent(item)).join(" "),this.authKey));
   }
   connect(id,password,callback) {
     if ( ! id || ! password ) {
@@ -87,7 +87,7 @@ export default class HTTPDevice {
     },true);
   }
   disconnect(callback) {
-    this.transmit("DCONN",_ => {
+    this.transmit(["DCONN"],_ => {
       this.connectionID = null;
       this.address = null;
       this.authKey = null;

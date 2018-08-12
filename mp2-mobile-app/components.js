@@ -30,8 +30,7 @@ export class NavigationPage extends React.Component {
     super();
   }
   componentWillMount() {
-    this.props.httpDevice.transmit(`LIST /${this.props.path.join("/")}`,output => {
-      console.log(output);
+    this.props.httpDevice.transmit(["LIST",`/${this.props.path.join("/")}`],output => {
       this.props.setParam("items",output);
     });
   }
@@ -60,10 +59,10 @@ export class NavigationPage extends React.Component {
     );
   }
   _moveForward(item) {
-    this.props.httpDevice.transmit(`TYPE /${this.props.path.join("/")}`,output => {
+    this.props.httpDevice.transmit(["TYPE",`/${this.props.path.join("/")}`],output => {
       this.props.path.push(item);
       if ( output == "directory" ) {
-        this.props.httpDevice.transmit(`LIST /${this.props.path.join("/")}`,output => {
+        this.props.httpDevice.transmit(["LIST",`/${this.props.path.join("/")}`],output => {
           this.props.setParam("items",output);
           this.props.setParam("path",this.props.path);
         });
@@ -75,7 +74,7 @@ export class NavigationPage extends React.Component {
   _moveBack() {
     var path = this.props.path.slice(0,-1);
     if ( path.length > 0 ) {
-      this.props.httpDevice.transmit(`LIST /${path.join("/")}`,output => {
+      this.props.httpDevice.transmit(["LIST",`/${path.join("/")}`],output => {
         this.props.setParam("items",output);
         this.props.setParam("path",path);
       });
@@ -94,7 +93,7 @@ export class MusicSelectPage extends React.Component {
     this.hasAddedToQueue = false;
   }
   componentWillMount() {
-    this.props.httpDevice.transmit(`LIST /${this.props.path.join("/")}`,output => {
+    this.props.httpDevice.transmit(["LIST",`/${this.props.path.join("/")}`],output => {
       this.props.setParam("items",output);
     });
   }
@@ -163,7 +162,7 @@ export class MusicSelectPage extends React.Component {
   _addToQueue() {
     if ( this.hasAddedToQueue ) return;
     this.hasAddedToQueue = true;
-    this.props.httpDevice.transmit(`ADDTQ /${this.props.path.join("/")} ${this.state.selected.sort((a,b) => a - b).map(item => this.props.items[item]).join(" ")}`,output => {
+    this.props.httpDevice.transmit(["ADDTQ",`/${this.props.path.join("/")}`].concat(this.state.selected.sort((a,b) => a - b).map(item => this.props.items[item])),output => {
       this.props.setParam("component","MainPage");
     });
   }
@@ -182,7 +181,7 @@ export class PhotoSelectPage extends React.Component {
     }
   }
   componentWillMount() {
-    this.props.httpDevice.transmit(`OPENP /${this.props.path.join("/")}`,output => {
+    this.props.httpDevice.transmit(["OPENP",`/${this.props.path.join("/")}`],output => {
       this.setState({
         picName: output
       });
@@ -218,7 +217,7 @@ export class PhotoSelectPage extends React.Component {
   }
   _movePicture(direction) {
     if ( direction == "left" ) {
-      this.props.httpDevice.transmit("PREVP",output => {
+      this.props.httpDevice.transmit(["PREVP"],output => {
         var warnMode = 0;
         if ( output.endsWith("_first") ) {
           output = output.slice(0,-6);
@@ -230,7 +229,7 @@ export class PhotoSelectPage extends React.Component {
         });
       });
     } else {
-      this.props.httpDevice.transmit("NEXTP",output => {
+      this.props.httpDevice.transmit(["NEXTP"],output => {
         var warnMode = 0;
         if ( output.endsWith("_last") ) {
           output = output.slice(0,-5);
@@ -244,7 +243,7 @@ export class PhotoSelectPage extends React.Component {
     }
   }
   _moveBack() {
-    this.props.httpDevice.transmit("HOME",output => {
+    this.props.httpDevice.transmit(["HOME"],output => {
       this.props.setParam("path",this.props.path.slice(0,-1));
       this.props.setParam("component","NavigationPage");
     });
@@ -274,7 +273,7 @@ export class WebPage extends React.Component {
           <View style={styles.buttonPanel}>
             <Button
               text="Go"
-              onPress={_ => this.props.httpDevice.transmit(`WOPN ${this.state.url}`,Function.prototype)}
+              onPress={_ => this.props.httpDevice.transmit(["WOPN",this.state.url],Function.prototype)}
               style={styles.blueCenterText}
               specialWidth={styles.halfButton}
             />
@@ -290,7 +289,7 @@ export class WebPage extends React.Component {
     );
   }
   _moveBack() {
-    this.props.httpDevice.transmit("HOME",output => {
+    this.props.httpDevice.transmit(["HOME"],output => {
       this.props.setParam("component","MainPage");
     });
   }
@@ -305,7 +304,7 @@ export class QueuePage extends React.Component {
     }
   }
   componentWillMount() {
-    this.props.httpDevice.transmit("GETQ",output => {
+    this.props.httpDevice.transmit(["GETQ"],output => {
       this.setState({
         playing: output[0] == "playing",
         queue: output.slice(1)
@@ -320,7 +319,7 @@ export class QueuePage extends React.Component {
         <View style={styles.buttonPanel}>
           <Button
             text={"\u23ea"}
-            onPress={_ => this.props.httpDevice.transmit("RWIND",Function.prototype)}
+            onPress={_ => this.props.httpDevice.transmit(["RWIND"],Function.prototype)}
             style={styles.titleText}
             specialWidth={styles.thirdButton}
           />
@@ -332,7 +331,7 @@ export class QueuePage extends React.Component {
           />
           <Button
             text={"\u23e9"}
-            onPress={_ => this._mapCommandToQueue("PNSNG")}
+            onPress={_ => this._mapCommandToQueue(["PNSNG"])}
             style={styles.titleText}
             specialWidth={styles.thirdButton}
           />
@@ -340,13 +339,13 @@ export class QueuePage extends React.Component {
         <View style={styles.buttonPanel}>
           <Button
             text={"\ud83d\udd00"}
-            onPress={_ => this._mapCommandToQueue("SHFLQ")}
+            onPress={_ => this._mapCommandToQueue(["SHFLQ"])}
             style={styles.titleText}
             specialWidth={styles.thirdButton}
           />
           <Button
             text="X"
-            onPress={_ => this._mapCommandToQueue("CLRQ")}
+            onPress={_ => this._mapCommandToQueue(["CLRQ"])}
             style={styles.redCenterText}
             specialWidth={styles.thirdButton}
           />
@@ -367,25 +366,25 @@ export class QueuePage extends React.Component {
                   <View style={styles.buttonPanel}>
                     <Button
                       text={"\u2912"}
-                      onPress={_ => this._mapCommandToQueue(`UPSQ ${index + 1} true`)}
+                      onPress={_ => this._mapCommandToQueue(["UPSQ",index + 1,"true"])}
                       style={styles.titleText}
                       specialWidth={styles.quarterButton}
                     />
                     <Button
                       text={"\u2191"}
-                      onPress={_ => this._mapCommandToQueue(`UPSQ ${index + 1} false`)}
+                      onPress={_ => this._mapCommandToQueue(["UPSQ","index + 1","false"])}
                       style={styles.titleText}
                       specialWidth={styles.quarterButton}
                     />
                     <Button
                       text={"\u2193"}
-                      onPress={_ => this._mapCommandToQueue(`DWNSQ ${index + 1}`)}
+                      onPress={_ => this._mapCommandToQueue(["DWNSQ",index + 1])}
                       style={styles.titleText}
                       specialWidth={styles.quarterButton}
                     />
                     <Button
                       text="X"
-                      onPress={_ => this._mapCommandToQueue("CLRQ")}
+                      onPress={_ => this._mapCommandToQueue(["CLRQ"])}
                       style={styles.redCenterText}
                       specialWidth={styles.quarterButton}
                     />
@@ -399,7 +398,7 @@ export class QueuePage extends React.Component {
     );
   }
   _togglePlay() {
-    this.props.httpDevice.transmit("PLYPS",output => {
+    this.props.httpDevice.transmit(["PLYPS"],output => {
       this.setState({
         playing: ! this.state.playing
       });
