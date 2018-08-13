@@ -41,17 +41,19 @@ export default class HTTPDevice {
     this.connectionID = null;
     this.address = null;
     this.authKey = null;
-    this.readyTick = 0;
-    setInterval(_ => {
-      this.readyTick = Math.max(this.readyTick - 1,0);
-    },1);
+    this.waiting = false;
   }
   transmit(message,callback,rawMode) {
+    var resetWaiting = _ => this.waiting = false;
+    console.log(this.waiting);
+    if ( this.waiting ) return;
+    this.waiting = true;
     var cg = new Cryptographer();
     var req = new XMLHttpRequest();
     req.open("POST",`http://${this.address}/receive`);
     var authKey = this.authKey;
     req.onload = function() {
+      resetWaiting();
       if ( rawMode ) {
         callback(this.responseText);
       } else {
