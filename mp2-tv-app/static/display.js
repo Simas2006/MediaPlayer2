@@ -25,12 +25,14 @@ class MusicAgent {
       item.innerText = this.queue[i];
       list.appendChild(item);
     }
+    if ( this.queue.length <= 1 ) document.getElementById("nothingText").innerText = "Nothing!";
+    else document.getElementById("nothingText").innerText = "";
   }
   updateTimeInfo() {
     var pad = n => n >= 10 ? n : "0" + n;
     var currentTime = Math.floor(this.audio.currentTime);
     var currentTimeM = this.queue[0] ? Math.floor(currentTime / 60) : "-";
-    var currentTimeS = this.queue[0] ? pad(currentTime % 60) : "-";
+    var currentTimeS = this.queue[0] ? pad(currentTime % 60) : "--";
     var negativeTime = Math.floor(this.audio.duration - this.audio.currentTime);
     var negativeTimeM = this.queue[0] ? "-" + Math.floor(negativeTime / 60) : "-";
     var negativeTimeS = this.queue[0] ? pad(negativeTime % 60) : "--";
@@ -93,7 +95,9 @@ class MusicAgent {
  * - movePicture(toMove)
  * - openURL(url)
  * - playNextSong √
- * - rewindSong
+ * - rewindSong √
+ * - getVolume √
+ * - setVolume √
  */
 
 var magent;
