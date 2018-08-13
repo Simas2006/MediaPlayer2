@@ -106,7 +106,7 @@ export class MusicSelectPage extends React.Component {
         {
           this.props.items.map((item,index) => (
             <Button
-              text={item}
+              text={formatSongName(item)}
               onPress={_ => this._toggleItem(index)}
               style={this.state.selected.indexOf(index) > -1 ? styles.greenText : styles.blueText}
               key={sha256(item).toString()}
@@ -320,7 +320,7 @@ export class QueuePage extends React.Component {
     return (
       <View>
         <Text style={styles.bigText}>MediaPlayer2</Text>
-        <Text style={styles.titleText}>Now Playing: {this.state.queue[0] || "Nothing!"}</Text>
+        <Text style={styles.titleText}>Now Playing: {formatSongName(this.state.queue[0]) || "Nothing!"}</Text>
         <View style={styles.buttonPanel}>
           <Button
             text={"\u23ea"}
@@ -387,7 +387,7 @@ export class QueuePage extends React.Component {
             this.state.queue.slice(1).map((item,index) => {
               return (
                 <View key={sha256(item + Math.random())}> // im sorry
-                  <Text style={styles.normalText}>{item}</Text>
+                  <Text style={styles.normalText}>{formatSongName(item)}</Text>
                   <View style={styles.buttonPanel}>
                     <Button
                       text={"\u2912"}
@@ -447,4 +447,20 @@ export class QueuePage extends React.Component {
 
 function capitalizeFirstLetter(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function formatSongName(name) {
+  if ( ! name ) return name;
+  var extIndex = name.lastIndexOf(".");
+  var pathIndex = name.lastIndexOf("/");
+  name = name.slice(pathIndex + 1,extIndex);
+  var numberIndex = 0;
+  for ( var i = 0; i < name.length; i++ ) {
+    if ( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".indexOf(name.charAt(i)) > -1 ) {
+      numberIndex = i;
+      break;
+    }
+  }
+  name = name.slice(numberIndex);
+  return name;
 }

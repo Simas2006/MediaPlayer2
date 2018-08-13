@@ -15,14 +15,14 @@ class MusicAgent {
   render() {
     if ( this.playing ) document.getElementById("paused").innerText = "";
     else document.getElementById("paused").innerText = "Paused";
-    document.getElementById("playing").innerText = this.queue[0] || "Nothing!";
+    document.getElementById("playing").innerText = this.formatSongName(this.queue[0]) || "Nothing!";
     var list = document.getElementById("queue");
     while ( list.firstChild ) {
       list.removeChild(list.firstChild);
     }
     for ( var i = 1; i < this.queue.length; i++ ) {
       var item = document.createElement("li");
-      item.innerText = this.queue[i];
+      item.innerText = this.formatSongName(this.queue[i]);
       list.appendChild(item);
     }
     if ( this.queue.length <= 1 ) document.getElementById("nothingText").innerText = "Nothing!";
@@ -49,6 +49,21 @@ class MusicAgent {
     }
     this.playing = true;
     this.render();
+  }
+  formatSongName(name) {
+    if ( ! name ) return name;
+    var extIndex = name.lastIndexOf(".");
+    var pathIndex = name.lastIndexOf("/");
+    name = name.slice(pathIndex + 1,extIndex);
+    var numberIndex = 0;
+    for ( var i = 0; i < name.length; i++ ) {
+      if ( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".indexOf(name.charAt(i)) > -1 ) {
+        numberIndex = i;
+        break;
+      }
+    }
+    name = name.slice(numberIndex);
+    return name;
   }
   eGetQueue() {
     return this.queue;
