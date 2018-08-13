@@ -27,3 +27,10 @@ DWNSQ <index>              ; Moves the indexed song in the queue downward one so
 DELSQ <index>              ; Removes the indexed song from the queue. Returns the same result as GETQ.
 CLRQ                       ; Clears the queue and triggers PNSNG. Returns "ok" normally.
 SHFLQ                      ; Shuffles the queue. Returns "ok" normally.
+
+--- Layer Spec ---
+Mobile App Front-End (shows choices to user)
+Mobile App HTTPDevice (crypto, sending and recieving HTTP)
+TV App Server (crypto, authenticatio, sending and recieving HTTP, communicating with interactions)
+TV App Interactions.js (fires handlers for commands, back-end of directory listing)
+TV App Front-End (shows choices to user, displays pictures, webpages)
