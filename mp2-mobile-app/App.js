@@ -158,6 +158,7 @@ class MainPage extends React.Component {
   _openPage(page,componentName,navPage) {
     this.props.setParam("nextComponent",componentName);
     this.props.setParam("path",[page]);
+    this.props.setParam("items",[]);
     this.props.setParam("component",navPage ? "NavigationPage" : componentName);
   }
   _disconnect() {
