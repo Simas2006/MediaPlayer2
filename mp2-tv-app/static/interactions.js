@@ -149,5 +149,43 @@ function parseCommand(command,handlers,callback) {
     callback("ok");
   } else if ( commandName == "GETQ" ) {
     callback([handlers.isPlaying() ? "playing" : "paused"].concat(handlers.getQueue()));
+  } else if ( commandName == "UPSQ" ) {
+    var queue = handlers.getQueue();
+    var fromIndex = parseInt(command[1]);
+    if ( fromIndex <= 0 || fromIndex >= queue.length ) {
+      callback("error");
+      return;
+    }
+    if ( fromIndex == 1 ) {
+      callback([handlers.isPlaying() ? "playing" : "paused"].concat(handlers.getQueue()));
+      return;
+    }
+    var toIndex;
+    if ( command[2] == "false" ) toIndex = fromIndex - 1;
+    else toIndex = 1;
+    queue.splice(toIndex,0,queue.splice(fromIndex,1)[0]);
+    handlers.setQueue(queue);
+    callback([handlers.isPlaying() ? "playing" : "paused"].concat(handlers.getQueue()));
+  } else if ( commandName == "DWNSQ" ) {
+    var queue = handlers.getQueue();
+    var fromIndex = parseInt(command[1]);
+    if ( fromIndex <= 0 || fromIndex >= queue.length ) {
+      callback("error");
+      return;
+    }
+    var toIndex = fromIndex + 1;
+    queue.splice(toIndex,0,queue.splice(fromIndex,1)[0]);
+    handlers.setQueue(queue);
+    callback([handlers.isPlaying() ? "playing" : "paused"].concat(handlers.getQueue()));
+  } else if ( commandName == "DELSQ" ) {
+    var queue = handlers.getQueue();
+    var index = parseInt(command[1]);
+    if ( index <= 0 || index >= queue.length ) {
+      callback("error");
+      return;
+    }
+    queue.splice(index,1);
+    handlers.setQueue(queue);
+    callback([handlers.isPlaying() ? "playing" : "paused"].concat(handlers.getQueue()));
   }
 }
