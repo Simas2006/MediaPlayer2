@@ -4,9 +4,12 @@ var ihandlers;
 class MusicAgent {
   constructor() {
     this.queue = "abcdefghijklmnopqrstuvwxyz".split("").map(item => item + "avanese.m4a");
+    this.playing = true;
   }
   render() {
-    document.getElementById("playing").innerText = "Queue\nNow Playing: " + this.queue[0];
+    if ( this.playing ) document.getElementById("paused").innerText = "";
+    else document.getElementById("paused").innerText = "Paused";
+    document.getElementById("playing").innerText = "Now Playing: " + this.queue[0];
     var list = document.getElementById("queue");
     while ( list.firstChild ) {
       list.removeChild(list.firstChild);
@@ -24,13 +27,20 @@ class MusicAgent {
     this.queue = newQueue;
     this.render();
   }
+  eIsPlaying() {
+    return this.playing;
+  }
+  eTogglePlay() {
+    this.playing = ! this.playing;
+    this.render();
+  }
 }
 
 /* API Handlers
- * - getQueue
- * - setQueue
- * - isPlaying
- * - togglePlay
+ * - getQueue √
+ * - setQueue √
+ * - isPlaying √
+ * - togglePlay √
  * - openHome
  * - openAlbum(album)
  * - movePicture(toMove)
@@ -42,8 +52,10 @@ class MusicAgent {
 window.onload = function() {
   var magent = new MusicAgent();
   ihandlers = {
-    getQueue: magent.eGetQueue.bind(magent),
-    setQueue: magent.eSetQueue.bind(magent)
+    getQueue:   magent.eGetQueue.bind(magent),
+    setQueue:   magent.eSetQueue.bind(magent),
+    isPlaying:  magent.eIsPlaying.bind(magent),
+    togglePlay: magent.eTogglePlay.bind(magent)
   }
   magent.render();
 }
