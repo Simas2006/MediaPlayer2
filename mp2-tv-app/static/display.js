@@ -45,6 +45,7 @@ class MusicAgent {
       this.audio.src = "";
       this.audio.pause();
     }
+    this.playing = true;
     this.render();
   }
   eGetQueue() {
@@ -61,12 +62,17 @@ class MusicAgent {
   }
   eTogglePlay() {
     this.playing = ! this.playing;
-    if ( this.playing ) this.audio.play();
-    else this.audio.pause();
+    if ( this.queue[0] ) {
+      if ( this.playing ) this.audio.play();
+      else this.audio.pause();
+    }
     this.render();
   }
   ePlayNextSong() {
     this.triggerNextSong(false);
+  }
+  eRewindSong() {
+    this.audio.currentTime = 0;
   }
 }
 
@@ -91,7 +97,9 @@ window.onload = function() {
     setQueue:     magent.eSetQueue.bind(magent),
     isPlaying:    magent.eIsPlaying.bind(magent),
     togglePlay:   magent.eTogglePlay.bind(magent),
-    playNextSong: magent.ePlayNextSong.bind(magent)
+    playNextSong: magent.ePlayNextSong.bind(magent),
+    rewindSong:   magent.eRewindSong.bind(magent)
   }
   magent.render();
+  initCommandHandling(ihandlers);
 }
