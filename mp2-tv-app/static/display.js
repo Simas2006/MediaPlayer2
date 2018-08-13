@@ -74,6 +74,13 @@ class MusicAgent {
   eRewindSong() {
     this.audio.currentTime = 0;
   }
+  eGetVolume() {
+    return this.volume;
+  }
+  eSetVolume(newVolume) {
+    this.volume = newVolume;
+    this.audio.volume = newVolume / 100;
+  }
 }
 
 /* API Handlers
@@ -98,7 +105,9 @@ window.onload = function() {
     isPlaying:    magent.eIsPlaying.bind(magent),
     togglePlay:   magent.eTogglePlay.bind(magent),
     playNextSong: magent.ePlayNextSong.bind(magent),
-    rewindSong:   magent.eRewindSong.bind(magent)
+    rewindSong:   magent.eRewindSong.bind(magent),
+    getVolume:    magent.eGetVolume.bind(magent),
+    setVolume:    magent.eSetVolume.bind(magent),
   }
   magent.render();
   initCommandHandling(ihandlers);

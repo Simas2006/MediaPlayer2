@@ -1,5 +1,6 @@
 var fs = require("fs");
 var DATA_LOC = __dirname + "/../data";
+var lastVolume = 0;
 
 function initCommandHandling(handlers) {
   // launch server around here
@@ -48,6 +49,9 @@ function validateCommand(command,callback) {
     "PLYPS": 1,
     "PNSNG": 1,
     "RWIND": 1,
+    "UPVL":  1,
+    "DWNVL": 1,
+    "MUTVL": 1,
     "GETQ" : 1,
     "UPSQ" : 3,
     "DWNSQ": 2,
@@ -88,7 +92,7 @@ function validateCommand(command,callback) {
         }
         callback(true);
       });
-    } else if ( commandName == "UPSQ" || commandName == "DWNSQ" || commandName == "DELSQ" ) {
+    } else if ( ["UPSQ","DWNSQ","DELSQ"].indexOf(commandName) > -1 ) {
       if ( commandName == "UPSQ" && ["true","false"].indexOf(command[2]) <= -1 ) {
         callback(false);
         return;
@@ -142,12 +146,32 @@ function parseCommand(command,handlers,callback) {
     callback("ok");
   } else if ( commandName == "PNSNG" ) {
     handlers.playNextSong();
-    callback([handlers.isPlaying() ? "playing" : "paused"].concat(handlers.getQueue()));
+    callback([(handlers.isPlaying() ? "playing" : "paused") + ":" + handlers.getVolume()].concat(handlers.getQueue()));
   } else if ( commandName == "RWIND" ) {
     handlers.rewindSong();
     callback("ok");
+  } else if ( commandName == "UPVL" ) {
+    var vol = handlers.getVolume();
+    vol = Math.min(vol + 5,100);
+    handlers.setVolume(vol);
+    callback(vol);
+  } else if ( commandName == "DWNVL" ) {
+    var vol = handlers.getVolume();
+    vol = Math.max(vol - 5,0);
+    handlers.setVolume(vol);
+    callback(vol);
+  } else if ( commandName == "MUTVL" ) {
+    var vol = handlers.getVolume();
+    if ( vol > 0 ) {
+      lastVolume = vol;
+      vol = 0;
+    } else {
+      vol = lastVolume;
+    }
+    handlers.setVolume(vol);
+    callback(vol);
   } else if ( commandName == "GETQ" ) {
-    callback([handlers.isPlaying() ? "playing" : "paused"].concat(handlers.getQueue()));
+    callback([(handlers.isPlaying() ? "playing" : "paused") + ":" + handlers.getVolume()].concat(handlers.getQueue()));
   } else if ( commandName == "UPSQ" ) {
     var queue = handlers.getQueue();
     var fromIndex = parseInt(command[1]);
@@ -156,7 +180,7 @@ function parseCommand(command,handlers,callback) {
       return;
     }
     if ( fromIndex == 1 ) {
-      callback([handlers.isPlaying() ? "playing" : "paused"].concat(handlers.getQueue()));
+      callback([(handlers.isPlaying() ? "playing" : "paused") + ":" + handlers.getVolume()].concat(handlers.getQueue()));
       return;
     }
     var toIndex;
@@ -164,7 +188,7 @@ function parseCommand(command,handlers,callback) {
     else toIndex = 1;
     queue.splice(toIndex,0,queue.splice(fromIndex,1)[0]);
     handlers.setQueue(queue);
-    callback([handlers.isPlaying() ? "playing" : "paused"].concat(handlers.getQueue()));
+    callback([(handlers.isPlaying() ? "playing" : "paused") + ":" + handlers.getVolume()].concat(handlers.getQueue()));
   } else if ( commandName == "DWNSQ" ) {
     var queue = handlers.getQueue();
     var fromIndex = parseInt(command[1]);
@@ -175,7 +199,7 @@ function parseCommand(command,handlers,callback) {
     var toIndex = fromIndex + 1;
     queue.splice(toIndex,0,queue.splice(fromIndex,1)[0]);
     handlers.setQueue(queue);
-    callback([handlers.isPlaying() ? "playing" : "paused"].concat(handlers.getQueue()));
+    callback([(handlers.isPlaying() ? "playing" : "paused") + ":" + handlers.getVolume()].concat(handlers.getQueue()));
   } else if ( commandName == "DELSQ" ) {
     var queue = handlers.getQueue();
     var index = parseInt(command[1]);
@@ -185,11 +209,11 @@ function parseCommand(command,handlers,callback) {
     }
     queue.splice(index,1);
     handlers.setQueue(queue);
-    callback([handlers.isPlaying() ? "playing" : "paused"].concat(handlers.getQueue()));
+    callback([(handlers.isPlaying() ? "playing" : "paused") + ":" + handlers.getVolume()].concat(handlers.getQueue()));
   } else if ( commandName == "CLRQ" ) {
     handlers.setQueue([]);
     handlers.playNextSong();
-    callback([handlers.isPlaying() ? "playing" : "paused"].concat(handlers.getQueue()));
+    callback([(handlers.isPlaying() ? "playing" : "paused") + ":" + handlers.getVolume()].concat(handlers.getQueue()));
   } else if ( commandName == "SHFLQ" ) {
     var queue = handlers.getQueue().slice(1);
     for ( var i = 0; i < queue.length; i++ ) {
@@ -199,7 +223,7 @@ function parseCommand(command,handlers,callback) {
       queue[rand] = temp;
     }
     handlers.setQueue([handlers.getQueue()[0]].concat(queue));
-    callback([handlers.isPlaying() ? "playing" : "paused"].concat(handlers.getQueue()));
+    callback([(handlers.isPlaying() ? "playing" : "paused") + ":" + handlers.getVolume()].concat(handlers.getQueue()));
   } else {
     callback("error");
   }

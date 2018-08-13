@@ -302,13 +302,16 @@ export class QueuePage extends React.Component {
     super();
     this.state = {
       playing: null,
+      volume: 0,
       queue: []
     }
   }
   componentWillMount() {
     this.props.httpDevice.transmit(["GETQ"],output => {
+      output[0] = output[0].split(":");
       this.setState({
-        playing: output[0] == "playing",
+        playing: output[0][0] == "playing",
+        volume: output[0][1],
         queue: output.slice(1)
       });
     });
@@ -334,6 +337,26 @@ export class QueuePage extends React.Component {
           <Button
             text={"\u23e9"}
             onPress={_ => this._mapCommandToQueue(["PNSNG"])}
+            style={styles.titleText}
+            specialWidth={styles.thirdButton}
+          />
+        </View>
+        <View style={styles.buttonPanel}>
+          <Button
+            text={"V-"}
+            onPress={_ => this._mapCommandToVolume(["DWNVL"])}
+            style={styles.titleText}
+            specialWidth={styles.thirdButton}
+          />
+          <Button
+            text={this.state.volume + "%"}
+            onPress={_ => this._mapCommandToVolume(["MUTVL"])}
+            style={styles.titleText}
+            specialWidth={styles.thirdButton}
+          />
+          <Button
+            text={"V+"}
+            onPress={_ => this._mapCommandToVolume(["UPVL"])}
             style={styles.titleText}
             specialWidth={styles.thirdButton}
           />
@@ -410,6 +433,13 @@ export class QueuePage extends React.Component {
     this.props.httpDevice.transmit(command,output => {
       this.setState({
         queue: output.slice(1)
+      });
+    });
+  }
+  _mapCommandToVolume(command) {
+    this.props.httpDevice.transmit(command,output => {
+      this.setState({
+        volume: output
       });
     });
   }
