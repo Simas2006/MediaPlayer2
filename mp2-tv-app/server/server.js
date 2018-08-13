@@ -134,3 +134,13 @@ if ( DEBUG_MODE_TEXT ) {
 app.listen(PORT,function() {
   console.log("Listening on port " + PORT);
 });
+
+process.on("SIGINT",function() {
+  fs.unlink(__dirname + "/inputCmd",function(err) {
+    if ( err && err.code != "ENOENT" ) throw err;
+    fs.unlink(__dirname + "/outputCmd",function(err) {
+      if ( err && err.code != "ENOENT" ) throw err;
+      process.exit();
+    });
+  });
+});
