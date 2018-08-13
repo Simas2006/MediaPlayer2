@@ -374,7 +374,7 @@ export class QueuePage extends React.Component {
                     />
                     <Button
                       text={"\u2191"}
-                      onPress={_ => this._mapCommandToQueue(["UPSQ","index + 1","false"])}
+                      onPress={_ => this._mapCommandToQueue(["UPSQ",index + 1,"false"])}
                       style={styles.titleText}
                       specialWidth={styles.quarterButton}
                     />
@@ -386,7 +386,7 @@ export class QueuePage extends React.Component {
                     />
                     <Button
                       text="X"
-                      onPress={_ => this._mapCommandToQueue(["CLRQ"])}
+                      onPress={_ => this._mapCommandToQueue(["DELSQ",index + 1])}
                       style={styles.redCenterText}
                       specialWidth={styles.quarterButton}
                     />
