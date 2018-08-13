@@ -104,7 +104,6 @@ function validateCommand(command,callback) {
 
 function parseCommand(command,handlers,callback) {
   var commandName = command[0];
-  console.log(commandName);
   if ( commandName == "LIST" ) {
     fs.readdir(DATA_LOC + "/" + command[1],function(err,files) {
       if ( err ) throw err;
