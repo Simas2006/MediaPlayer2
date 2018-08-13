@@ -3,13 +3,16 @@ var ihandlers;
 
 class MusicAgent {
   constructor() {
-    this.queue = "abcdefghijklmnopqrstuvwxyz".split("").map(item => item + "avanese.m4a");
+    this.queue = [];
     this.playing = true;
+    document.getElementById("audio").onended = function() {
+      this.triggerNextSong(false);
+    }.bind(this);
   }
   render() {
     if ( this.playing ) document.getElementById("paused").innerText = "";
     else document.getElementById("paused").innerText = "Paused";
-    document.getElementById("playing").innerText = "Now Playing: " + this.queue[0];
+    document.getElementById("playing").innerText = "Now Playing: " + (this.queue[0] || "Nothing!");
     var list = document.getElementById("queue");
     while ( list.firstChild ) {
       list.removeChild(list.firstChild);
@@ -20,12 +23,25 @@ class MusicAgent {
       list.appendChild(item);
     }
   }
+  triggerNextSong(newElements) {
+    if ( ! newElements ) this.queue.splice(0,1);
+    if ( this.queue[0] ) {
+      document.getElementById("audio").src = __dirname + "/../data/" + this.queue[0];
+      document.getElementById("audio").play();
+    } else {
+      document.getElementById("audio").src = "";
+      document.getElementById("audio").pause();
+    }
+    this.render();
+  }
   eGetQueue() {
     return this.queue;
   }
   eSetQueue(newQueue) {
+    var newSong = this.queue[0];
     this.queue = newQueue;
-    this.render();
+    if ( ! newSong ) this.triggerNextSong(true);
+    else this.render();
   }
   eIsPlaying() {
     return this.playing;
@@ -33,6 +49,9 @@ class MusicAgent {
   eTogglePlay() {
     this.playing = ! this.playing;
     this.render();
+  }
+  ePlayNextSong() {
+    this.triggerNextSong(false);
   }
 }
 
@@ -45,17 +64,19 @@ class MusicAgent {
  * - openAlbum(album)
  * - movePicture(toMove)
  * - openURL(url)
- * - playNextSong
+ * - playNextSong √
  * - rewindSong
  */
 
+var magent;
 window.onload = function() {
-  var magent = new MusicAgent();
+  magent = new MusicAgent();
   ihandlers = {
-    getQueue:   magent.eGetQueue.bind(magent),
-    setQueue:   magent.eSetQueue.bind(magent),
-    isPlaying:  magent.eIsPlaying.bind(magent),
-    togglePlay: magent.eTogglePlay.bind(magent)
+    getQueue:     magent.eGetQueue.bind(magent),
+    setQueue:     magent.eSetQueue.bind(magent),
+    isPlaying:    magent.eIsPlaying.bind(magent),
+    togglePlay:   magent.eTogglePlay.bind(magent),
+    playNextSong: magent.ePlayNextSong.bind(magent)
   }
   magent.render();
 }
