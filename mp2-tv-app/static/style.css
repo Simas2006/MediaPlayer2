@@ -1,9 +1,15 @@
 body {
   font-family: "Monaco";
 }
+h1,p {
+  margin: 0px;
+}
 .bold {
   font-weight: bold;
 }
 .red {
   color: red;
+}
+.centerPanel {
+  text-align: center;
 }

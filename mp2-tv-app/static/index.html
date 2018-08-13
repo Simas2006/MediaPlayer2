@@ -8,15 +8,20 @@
   <script src="interactions.js"></script>
 </head>
 <body>
-  <h1>MediaPlayer2</h1>
+  <div class="centerPanel">
+    <h1>MediaPlayer2</h1>
+    <span>Now Playing:</span>
+    <span class="bold red" id="paused"></span>
+    <br />
+    <span id="playing"></span>
+    <p id="timeInfo">-:-- | VOL&nbsp;&nbsp;50% | -:--</p>
+  </div>
   <hr />
   <audio id="audio"></audio>
   <div id="queuePage" class="box">
     <div>
       <span class="bold">Queue </span>
-      <span class="bold red" id="paused"></span>
     </div>
-    <p id="playing"></p>
     <ol type="1" id="queue"></ol>
   </div>
 </body>
