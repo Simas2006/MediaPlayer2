@@ -1,7 +1,9 @@
 var fs = require("fs");
 var queue = [];
+var isPlaying = true;
 var albumName = null;
 var albumIndex = 0;
+var currentURL = null;
 
 var rhandlers = {
   getQueue() {
@@ -9,6 +11,12 @@ var rhandlers = {
   },
   setQueue(newQueue) {
     queue = newQueue;
+  },
+  isPlaying() {
+    return isPlaying;
+  },
+  togglePlay() {
+    isPlaying = ! isPlaying;
   },
   openHome() {
     albumName = null;
@@ -30,5 +38,14 @@ var rhandlers = {
     if ( albumIndex == 0 && toMove == -1 ) suffix = "_first";
     if ( albumIndex < 0 ) albumIndex = list.length - 1;
     return list[albumIndex] + suffix;
+  },
+  openURL(url) {
+    currentURL = url;
+  },
+  playNextSong() {
+    queue = queue.slice(1);
+  },
+  rewindSong() {
+    // implement this
   }
 }

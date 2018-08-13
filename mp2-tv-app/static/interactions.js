@@ -2,6 +2,7 @@ var fs = require("fs");
 var DATA_LOC = __dirname + "/../data";
 
 function initCommandHandling(handlers) {
+  // launch server around here
   setInterval(function() {
     checkForCommand(handlers);
   },50);
@@ -17,7 +18,9 @@ function checkForCommand(handlers) {
     validateCommand(data,function(valid) {
       if ( valid ) {
         parseCommand(data,handlers,function(result) {
-          var toWrite = result.map(item => encodeURIComponent(item)).join(",");
+          var toWrite;
+          if ( result instanceof Object ) toWrite = result.map(item => encodeURIComponent(item)).join(",");
+          else toWrite = encodeURIComponent(result);
           if ( result.length == 1 ) toWrite += ",";
           fs.writeFile(__dirname + "/../server/outputCmd",toWrite,function(err) {
             if ( err ) throw err;
@@ -91,6 +94,8 @@ function validateCommand(command,callback) {
         return;
       }
       callback(! isNaN(parseInt(command[1])));
+    } else {
+      callback(true);
     }
   } else {
     callback(false);
@@ -99,6 +104,7 @@ function validateCommand(command,callback) {
 
 function parseCommand(command,handlers,callback) {
   var commandName = command[0];
+  console.log(commandName);
   if ( commandName == "LIST" ) {
     fs.readdir(DATA_LOC + "/" + command[1],function(err,files) {
       if ( err ) throw err;
@@ -109,16 +115,39 @@ function parseCommand(command,handlers,callback) {
       if ( err ) throw err;
       for ( var i = 0; i < files.length; i++ ) {
         if ( files[i].charAt(files[i].length - 4) == "." ) {
-          callback(["file"]);
+          callback("file");
           return;
         }
       }
-      callback(["directory"]);
+      callback("directory");
     });
   } else if ( commandName == "ADDTQ" ) {
     var queue = handlers.getQueue();
     queue = queue.concat(command.slice(2).map(item => command[1] + "/" + item));
     handlers.setQueue(queue);
     callback(["ok"]);
+  } else if ( commandName == "OPENP" ) {
+    callback(handlers.openAlbum(command[1]));
+  } else if ( commandName == "PREVP" ) {
+    callback(handlers.movePicture(-1));
+  } else if ( commandName == "NEXTP" ) {
+    callback(handlers.movePicture(1));
+  } else if ( commandName == "HOME" ) {
+    handlers.openHome();
+    callback("ok");
+  } else if ( commandName == "WOPN" ) {
+    handlers.openURL(command[1]);
+    callback("ok");
+  } else if ( commandName == "PLYPS" ) {
+    handlers.togglePlay();
+    callback("ok");
+  } else if ( commandName == "PNSNG" ) {
+    handlers.playNextSong();
+    callback([handlers.isPlaying() ? "playing" : "paused"].concat(handlers.getQueue()));
+  } else if ( commandName == "RWIND" ) {
+    handlers.rewindSong();
+    callback("ok");
+  } else if ( commandName == "GETQ" ) {
+    callback([handlers.isPlaying() ? "playing" : "paused"].concat(handlers.getQueue()));
   }
 }
