@@ -1,5 +1,5 @@
 var queue = [];
-var handlers = {
+var rhandlers = {
   getQueue() {
     return queue;
   },

@@ -113,5 +113,10 @@ function parseCommand(command,handlers,callback) {
       }
       callback(["directory"]);
     });
+  } else if ( commandName == "ADDTQ" ) {
+    var queue = handlers.getQueue();
+    queue = queue.concat(command.slice(2).map(item => command[1] + "/" + item));
+    handlers.setQueue(queue);
+    callback(["ok"]);
   }
 }
