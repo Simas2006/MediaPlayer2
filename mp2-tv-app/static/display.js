@@ -1,51 +1,49 @@
 var fs = require("fs");
-var queue = [];
-var isPlaying = true;
-var albumName = null;
-var albumIndex = 0;
-var currentURL = null;
+var ihandlers;
 
-var rhandlers = {
-  getQueue() {
-    return queue;
-  },
-  setQueue(newQueue) {
-    queue = newQueue;
-  },
-  isPlaying() {
-    return isPlaying;
-  },
-  togglePlay() {
-    isPlaying = ! isPlaying;
-  },
-  openHome() {
-    albumName = null;
-    albumIndex = 0;
-  },
-  openAlbum(album) {
-    albumName = album;
-    albumIndex = 0;
-    var list = fs.readdirSync(__dirname + "/../data" + albumName);
-    return list[0];
-  },
-  movePicture(toMove) {
-    if ( ! albumName ) return "error";
-    albumIndex += toMove;
-    var list = fs.readdirSync(__dirname + "/../data" + albumName);
-    var suffix = "";
-    if ( albumIndex + 1 == list.length && toMove == 1 ) suffix = "_last";
-    if ( albumIndex + 1 > list.length ) albumIndex = 0;
-    if ( albumIndex == 0 && toMove == -1 ) suffix = "_first";
-    if ( albumIndex < 0 ) albumIndex = list.length - 1;
-    return list[albumIndex] + suffix;
-  },
-  openURL(url) {
-    currentURL = url;
-  },
-  playNextSong() {
-    queue = queue.slice(1);
-  },
-  rewindSong() {
-    // implement this
+class MusicAgent {
+  constructor() {
+    this.queue = "abcdefghijklmnopqrstuvwxyz".split("").map(item => item + "avanese.m4a");
   }
+  render() {
+    document.getElementById("playing").innerText = "Queue\nNow Playing: " + this.queue[0];
+    var list = document.getElementById("queue");
+    while ( list.firstChild ) {
+      list.removeChild(list.firstChild);
+    }
+    for ( var i = 1; i < this.queue.length; i++ ) {
+      var item = document.createElement("li");
+      item.innerText = this.queue[i];
+      list.appendChild(item);
+    }
+  }
+  eGetQueue() {
+    return this.queue;
+  }
+  eSetQueue(newQueue) {
+    this.queue = newQueue;
+    this.render();
+  }
+}
+
+/* API Handlers
+ * - getQueue
+ * - setQueue
+ * - isPlaying
+ * - togglePlay
+ * - openHome
+ * - openAlbum(album)
+ * - movePicture(toMove)
+ * - openURL(url)
+ * - playNextSong
+ * - rewindSong
+ */
+
+window.onload = function() {
+  var magent = new MusicAgent();
+  ihandlers = {
+    getQueue: magent.eGetQueue.bind(magent),
+    setQueue: magent.eSetQueue.bind(magent)
+  }
+  magent.render();
 }
