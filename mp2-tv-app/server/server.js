@@ -126,7 +126,7 @@ app.get("/blank",function(request,response) {
 var DEBUG_MODE_TEXT = null;
 if ( DEBUG_MODE_TEXT ) {
   var cg = new Cryptographer();
-  AUTH_KEY = cg.generateKey("password");
+  AUTH_KEY = cg.generateKey(PASSWORD);
   console.log("!!! WARNING: DEBUG MODE IS ENABLED !!!");
   console.log(`Encrypted "${DEBUG_MODE_TEXT}" = "${cg.encrypt(DEBUG_MODE_TEXT,AUTH_KEY)}"`);
 }
