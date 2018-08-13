@@ -16,8 +16,10 @@ function checkForCommand(handlers) {
     data = data.toString().trim().split(" ").map(item => decodeURIComponent(item));
     validateCommand(data,function(valid) {
       if ( valid ) {
-        parseCommand(data,handlers,function(toWrite) {
-          fs.writeFile(__dirname + "/../server/outputCmd",toWrite.map(item => encodeURIComponent(item)).join(","),function(err) {
+        parseCommand(data,handlers,function(result) {
+          var toWrite = result.map(item => encodeURIComponent(item)).join(",");
+          if ( result.length == 1 ) toWrite += ",";
+          fs.writeFile(__dirname + "/../server/outputCmd",toWrite,function(err) {
             if ( err ) throw err;
           });
         });

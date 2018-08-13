@@ -55,6 +55,7 @@ export class NavigationPage extends React.Component {
           onPress={_ => this._moveBack()}
           style={styles.normalText}
         />
+        <Text>{"\n"}</Text>
       </View>
     );
   }
@@ -128,6 +129,7 @@ export class MusicSelectPage extends React.Component {
           onPress={_ => this._moveBack()}
           style={styles.normalText}
         />
+        <Text>{"\n"}</Text>
       </View>
     );
   }
