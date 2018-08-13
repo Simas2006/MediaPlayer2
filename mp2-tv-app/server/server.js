@@ -100,9 +100,9 @@ app.post("/receive",function(request,response) {
                     else throw err;
                   }
                   fs.unlink(__dirname + "/outputCmd",function(err) {
-                    if ( err ) throw err;
+                    if ( err && err.code != "ENOENT" ) throw err;
                     fs.unlink(__dirname + "/inputCmd",function(err) {
-                      if ( err ) throw err;
+                      if ( err && err.code != "ENOENT" ) throw err;
                       data = data.toString().trim();
                       if ( data == "ok" || data == "error" ) response.send(data);
                       else response.send(cg.encrypt(data,AUTH_KEY));
