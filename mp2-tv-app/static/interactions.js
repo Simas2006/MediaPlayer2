@@ -187,5 +187,21 @@ function parseCommand(command,handlers,callback) {
     queue.splice(index,1);
     handlers.setQueue(queue);
     callback([handlers.isPlaying() ? "playing" : "paused"].concat(handlers.getQueue()));
+  } else if ( commandName == "CLRQ" ) {
+    handlers.setQueue([]);
+    handlers.playNextSong();
+    callback([handlers.isPlaying() ? "playing" : "paused"].concat(handlers.getQueue()));
+  } else if ( commandName == "SHFLQ" ) {
+    var queue = handlers.getQueue().slice(1);
+    for ( var i = 0; i < queue.length; i++ ) {
+      var rand = Math.floor(Math.random() * (i + 1));
+      var temp = queue[i];
+      queue[i] = queue[rand];
+      queue[rand] = temp;
+    }
+    handlers.setQueue([handlers.getQueue()[0]].concat(queue));
+    callback([handlers.isPlaying() ? "playing" : "paused"].concat(handlers.getQueue()));
+  } else {
+    callback("error");
   }
 }
