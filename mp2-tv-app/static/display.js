@@ -100,24 +100,54 @@ class MusicAgent {
   }
 }
 
+class PhotoAgent {
+  constructor() {
+    this.albumName = null;
+    this.albumIndex = 0;
+    this.albumFiles = [];
+  }
+  render() {
+    document.getElementById("pictureName").innerText = decodeURIComponent(this.albumFiles[this.albumIndex]);
+    document.getElementById("picture").src = __dirname + "/../data/" + this.albumName + "/" + this.albumFiles[this.albumIndex];
+  }
+  eOpenAlbum(album) {
+    this.albumName = album;
+    this.albumIndex = 0;
+    this.albumFiles = fs.readdirSync(__dirname + "/../data/" + album).filter(item => ["jpg","png","gif"].map(jtem => item.toLowerCase().endsWith(jtem) ? "1" : "0").indexOf("1") > -1);
+    this.render();
+    return this.albumFiles[this.albumIndex];
+  }
+  eMovePicture(toMove) {
+    this.albumIndex += toMove;
+    var suffix = "";
+    if ( this.albumIndex <= -1 ) this.albumIndex = this.albumFiles.length - 1;
+    if ( this.albumIndex == 0 && toMove == -1 ) suffix = "_first";
+    if ( this.albumIndex + 1 == this.albumFiles.length && toMove == 1 ) suffix = "_last";
+    if ( this.albumIndex >= this.albumFiles.length ) this.albumIndex = 0;
+    this.render();
+    return decodeURIComponent(this.albumFiles[this.albumIndex]) + suffix;
+  }
+}
+
 /* API Handlers
  * - getQueue √
  * - setQueue √
  * - isPlaying √
  * - togglePlay √
- * - openHome
- * - openAlbum(album)
- * - movePicture(toMove)
- * - openURL(url)
  * - playNextSong √
  * - rewindSong √
  * - getVolume √
  * - setVolume √
+ * - openHome
+ * - openAlbum(album)
+ * - movePicture(toMove)
+ * - openURL(url)
  */
 
-var magent;
+var magent,pagent;
 window.onload = function() {
   magent = new MusicAgent();
+  pagent = new PhotoAgent();
   ihandlers = {
     getQueue:     magent.eGetQueue.bind(magent),
     setQueue:     magent.eSetQueue.bind(magent),
@@ -127,7 +157,9 @@ window.onload = function() {
     rewindSong:   magent.eRewindSong.bind(magent),
     getVolume:    magent.eGetVolume.bind(magent),
     setVolume:    magent.eSetVolume.bind(magent),
+    openAlbum:    pagent.eOpenAlbum.bind(pagent),
+    movePicture:  pagent.eMovePicture.bind(pagent),
+    openHome:     Function.prototype
   }
-  magent.render();
   initCommandHandling(ihandlers);
 }
