@@ -17,3 +17,6 @@ img {
 .centerPanel {
   text-align: center;
 }
+.hidden {
+  display: none;
+}

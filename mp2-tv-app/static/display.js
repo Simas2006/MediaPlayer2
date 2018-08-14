@@ -111,6 +111,7 @@ class PhotoAgent {
     document.getElementById("picture").src = __dirname + "/../data/" + this.albumName + "/" + this.albumFiles[this.albumIndex];
   }
   eOpenAlbum(album) {
+    openPage("photo");
     this.albumName = album;
     this.albumIndex = 0;
     this.albumFiles = fs.readdirSync(__dirname + "/../data/" + album).filter(item => ["jpg","png","gif"].map(jtem => item.toLowerCase().endsWith(jtem) ? "1" : "0").indexOf("1") > -1);
@@ -129,6 +130,14 @@ class PhotoAgent {
   }
 }
 
+function openPage(toOpen) {
+  var pages = ["queue","photo"];
+  for ( var i = 0; i < pages.length; i++ ) {
+    document.getElementById(pages[i] + "Page").className = "hidden";
+  }
+  document.getElementById(toOpen + "Page").className = "";
+}
+
 /* API Handlers
  * - getQueue √
  * - setQueue √
@@ -138,9 +147,9 @@ class PhotoAgent {
  * - rewindSong √
  * - getVolume √
  * - setVolume √
- * - openHome
- * - openAlbum(album)
- * - movePicture(toMove)
+ * - openHome √
+ * - openAlbum(album) √
+ * - movePicture(toMove) √
  * - openURL(url)
  */
 
@@ -159,7 +168,11 @@ window.onload = function() {
     setVolume:    magent.eSetVolume.bind(magent),
     openAlbum:    pagent.eOpenAlbum.bind(pagent),
     movePicture:  pagent.eMovePicture.bind(pagent),
-    openHome:     Function.prototype
+    openHome:     _ => {
+      openPage("queue");
+      magent.render();
+    }
   }
   initCommandHandling(ihandlers);
+  ihandlers.openHome();
 }
