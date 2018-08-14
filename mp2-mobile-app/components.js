@@ -201,7 +201,7 @@ export class PhotoSelectPage extends React.Component {
             onPress={_ => this._movePicture("left")}
             style={styles.largeText}
           />
-          <Text style={styles.largeText}>{this.state.picName}</Text>
+          <Text style={styles.largeText}>{decodeURIComponent(this.state.picName)}</Text>
           <Button
             text={"\u25b6"}
             onPress={_ => this._movePicture("right")}
