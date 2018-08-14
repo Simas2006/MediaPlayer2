@@ -1,4 +1,5 @@
 var fs = require("fs");
+var EXIF = require("exif-js");
 var ihandlers;
 
 class MusicAgent {
@@ -107,8 +108,30 @@ class PhotoAgent {
     this.albumFiles = [];
   }
   render() {
+    var calculateRatio = this.calculateRatio;
     document.getElementById("pictureName").innerText = decodeURIComponent(this.albumFiles[this.albumIndex]);
-    document.getElementById("picture").src = __dirname + "/../data/" + this.albumName + "/" + this.albumFiles[this.albumIndex];
+    var picture = document.getElementById("picture");
+    var img = new Image();
+    img.src = __dirname + "/../data/" + this.albumName + "/" + this.albumFiles[this.albumIndex];
+    img.onload = function() {
+      EXIF.getData(img,function() {
+        var orientation = EXIF.getTag(this,"Orientation");
+        var rotation = [0,0,180,0,0,90,0,270][orientation - 1] || 0;
+        var ratio = calculateRatio(img.width,img.height,window.innerWidth,window.innerHeight);
+        picture.src = img.src;
+        picture.width = img.width * ratio;
+        picture.height = img.height * ratio;
+        picture.onload = function() {
+          picture.style.transform = `rotate(${rotation}deg)`;
+        }
+      });
+    }
+  }
+  calculateRatio(width,height,maxWidth,maxHeight) {
+    for ( var i = 1; i > 0; i -= 0.01 ) {
+      if ( width * i <= maxWidth && height * i <= maxHeight ) return i;
+    }
+    throw new Error("No ratio found");
   }
   eOpenAlbum(album) {
     openPage("photo");
