@@ -8,6 +8,7 @@ CONN                       ; Creates an authentication key to be returned to the
 DCONN                      ; Deauthorizes a given connection. Is the last message sent to the server. Returns "ok" normally.
 LIST  <path>               ; Lists the contents of a directory.
 TYPE  <path>               ; If a directory signified by the path contains only other directories, returns "directory", otherwise, returns "file".
+PING                       ; If encrypted using a valid key, server should always return "ok". Used to check if the client has been forcibly DCONN'd.
 
 ADDTQ <dirpath> <filelist> ; Adds songs in the dirpath directory to the queue. Returns "ok" normally.
 OPENP <path>               ; Opens a photo album. Returns the name of the first photo normally.
