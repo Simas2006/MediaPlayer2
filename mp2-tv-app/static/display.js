@@ -128,8 +128,12 @@ class PhotoAgent {
     }
   }
   calculateRatio(width,height,maxWidth,maxHeight) {
-    for ( var i = 1; i > 0; i -= 0.01 ) {
-      if ( width * i <= maxWidth && height * i <= maxHeight ) return i;
+    var modifier;
+    if ( width >= maxWidth && height >= maxHeight ) modifier = -0.01;
+    else modifier = 0.01;
+    for ( var i = 1; i > 0; i += modifier ) {
+      if ( modifier == -0.01 && width * i <= maxWidth && height * i <= maxHeight ) return i;
+      else if ( modifier == 0.01 && (width * i > maxWidth || height * i > maxHeight) ) return i - 0.01;
     }
     throw new Error("No ratio found");
   }
