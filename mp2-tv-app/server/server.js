@@ -6,9 +6,10 @@ var PASSWORD = process.argv[2];
 var PORT = process.argv[3] || 5600;
 var AUTH_KEY = null;
 
-var COMMANDS = [ // excluding CONN
+var COMMANDS = [ // excluding CONN & DCONN
   "LIST",
   "TYPE",
+  "PING",
   "ADDTQ",
   "OPENP",
   "PREVP",
@@ -92,6 +93,10 @@ app.post("/receive",function(request,response) {
         } else if ( COMMANDS.indexOf(text[0]) <= -1 ) {
           response.send("error");
         } else {
+          if ( text[0] == "PING" ) {
+            response.send("ok");
+            return;
+          }
           fs.unlink(__dirname + "/outputCmd",function(err) {
             if ( err && err.code != "ENOENT" ) throw err;
             fs.writeFile(__dirname + "/inputCmd",text.join(" "),function(err) {
@@ -125,14 +130,6 @@ app.post("/receive",function(request,response) {
 app.get("/blank",function(request,response) {
   response.send("hi");
 });
-
-var DEBUG_MODE_TEXT = null;
-if ( DEBUG_MODE_TEXT ) {
-  var cg = new Cryptographer();
-  AUTH_KEY = cg.generateKey(PASSWORD);
-  console.log("!!! WARNING: DEBUG MODE IS ENABLED !!!");
-  console.log(`Encrypted "${DEBUG_MODE_TEXT}" = "${cg.encrypt(DEBUG_MODE_TEXT,AUTH_KEY)}"`);
-}
 
 app.listen(PORT,function() {
   console.log("Listening on port " + PORT);
