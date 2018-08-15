@@ -153,8 +153,24 @@ class PhotoAgent {
   }
 }
 
+class WebAgent {
+  constructor() {
+    this.url = null;
+  }
+  render() {
+    document.getElementById("webview").loadURL(this.url);
+  }
+  eOpenURL(url) {
+    openPage("web");
+    setTimeout(_ => {
+      this.url = "http://" + url;
+      this.render();
+    },50);
+  }
+}
+
 function openPage(toOpen) {
-  var pages = ["queue","photo"];
+  var pages = ["queue","photo","web"];
   for ( var i = 0; i < pages.length; i++ ) {
     document.getElementById(pages[i] + "Page").className = "hidden";
   }
@@ -170,16 +186,16 @@ function openPage(toOpen) {
  * - rewindSong √
  * - getVolume √
  * - setVolume √
- * - openHome √
  * - openAlbum(album) √
  * - movePicture(toMove) √
- * - openURL(url)
+ * - openURL(url) √
+ * - openHome √
  */
 
-var magent,pagent;
 window.onload = function() {
-  magent = new MusicAgent();
-  pagent = new PhotoAgent();
+  var magent = new MusicAgent();
+  var pagent = new PhotoAgent();
+  var wagent = new WebAgent();
   ihandlers = {
     getQueue:     magent.eGetQueue.bind(magent),
     setQueue:     magent.eSetQueue.bind(magent),
@@ -191,6 +207,7 @@ window.onload = function() {
     setVolume:    magent.eSetVolume.bind(magent),
     openAlbum:    pagent.eOpenAlbum.bind(pagent),
     movePicture:  pagent.eMovePicture.bind(pagent),
+    openURL:      wagent.eOpenURL.bind(wagent),
     openHome:     _ => {
       openPage("queue");
       magent.render();
