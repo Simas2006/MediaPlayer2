@@ -38,6 +38,15 @@ class MusicAgent {
     var negativeTimeM = this.queue[0] ? "-" + Math.floor(negativeTime / 60) : "-";
     var negativeTimeS = this.queue[0] ? pad(negativeTime % 60) : "--";
     document.getElementById("timeInfo").innerText = `${currentTimeM}:${currentTimeS} | VOL ${pad(this.volume)}% | ${negativeTimeM}:${negativeTimeS}`;
+    getConnectionState(function(connected) {
+      if ( connected ) {
+        document.getElementById("deviceText").innerText = "1 Device Connected";
+        document.getElementById("deviceLink").innerText = "Force Disconnect";
+      } else {
+        document.getElementById("deviceText").innerText = "0 Devices Connected";
+        document.getElementById("deviceLink").innerText = "";
+      }
+    });
   }
   triggerNextSong(newElements) {
     if ( ! newElements ) this.queue.splice(0,1);
