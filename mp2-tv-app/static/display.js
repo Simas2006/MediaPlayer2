@@ -2,6 +2,10 @@ var fs = require("fs");
 var EXIF = require("exif-js");
 var ihandlers;
 
+function replaceAll(oldChar,newChar,string) {
+  return string.split(oldChar).join(newChar);
+}
+
 class MusicAgent {
   constructor() {
     this.queue = [];
@@ -51,7 +55,7 @@ class MusicAgent {
   triggerNextSong(newElements) {
     if ( ! newElements ) this.queue.splice(0,1);
     if ( this.queue[0] ) {
-      this.audio.src = __dirname + "/../data/" + this.queue[0];
+      this.audio.src = __dirname + "/../data/" + replaceAll("#","%23",replaceAll("?","%3F",this.queue[0]));
       this.audio.play();
     } else {
       this.audio.src = "";
