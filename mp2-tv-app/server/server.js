@@ -143,7 +143,7 @@ function checkForForceDCONN() {
       if ( err.code == "ENOENT" ) return;
       else throw err;
     }
-    if ( data.toString() == "dconn" ) {
+    if ( data.toString().trim() == "dconn" ) {
       AUTH_KEY = null;
       fs.unlink(__dirname + "/connect",function(err) {
         if ( err ) throw err;

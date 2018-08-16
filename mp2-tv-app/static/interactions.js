@@ -228,3 +228,26 @@ function parseCommand(command,handlers,callback) {
     callback("error");
   }
 }
+
+function getConnectionState(callback) {
+  fs.stat(__dirname + "/../server/connect",function(err) {
+    if ( err ) {
+      if ( err.code == "ENOENT" ) callback(false);
+      else throw err;
+    } else {
+      callback(true);
+    }
+  });
+}
+
+function forceDCONN() {
+  fs.stat(__dirname + "/../server/connect",function(err) {
+    if ( err ) {
+      if ( err.code == "ENOENT" ) return;
+      else throw err;
+    }
+    fs.writeFile(__dirname + "/../server/connect","dconn",function(err) {
+      if ( err ) throw err;
+    });
+  });
+}
