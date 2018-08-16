@@ -433,6 +433,7 @@ export class QueuePage extends React.Component {
   }
   _mapCommandToQueue(command) {
     this.props.httpDevice.transmit(command,output => {
+      if ( ! output ) return;
       this.setState({
         queue: output.slice(1)
       });
