@@ -22,7 +22,7 @@ export default class App extends React.Component {
       items: [],
       nextComponent: ""
     }
-    setInterval(this._sendPing.bind(this),2500);
+    setInterval(this._sendPing.bind(this),1500);
   }
   render() {
     if ( this.state.component == "MainPage" ) {

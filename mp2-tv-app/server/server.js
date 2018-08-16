@@ -78,6 +78,9 @@ app.post("/receive",function(request,response) {
         AUTH_KEY = cg.generateKey();
         var toSend = `ok ${cg.encrypt(AUTH_KEY,key)}`;
         response.send(toSend);
+        fs.writeFile(__dirname + "/connect","conn",function(err) {
+          if ( err ) throw err;
+        });
       } else {
         response.send("error");
       }
@@ -90,6 +93,9 @@ app.post("/receive",function(request,response) {
         if ( text[0] == "DCONN" ) {
           AUTH_KEY = null;
           response.send("ok");
+          fs.unlink(__dirname + "/connect",function(err) {
+            if ( err ) throw err;
+          });
         } else if ( COMMANDS.indexOf(text[0]) <= -1 ) {
           response.send("error");
         } else {
@@ -131,7 +137,23 @@ app.get("/blank",function(request,response) {
   response.send("hi");
 });
 
+function checkForForceDCONN() {
+  fs.readFile(__dirname + "/connect",function(err,data) {
+    if ( err ) {
+      if ( err.code == "ENOENT" ) return;
+      else throw err;
+    }
+    if ( data.toString() == "dconn" ) {
+      AUTH_KEY = null;
+      fs.unlink(__dirname + "/connect",function(err) {
+        if ( err ) throw err;
+      });
+    }
+  });
+}
+
 app.listen(PORT,function() {
+  setInterval(checkForForceDCONN,1500);
   console.log("Listening on port " + PORT);
 });
 
