@@ -22,6 +22,7 @@ export default class App extends React.Component {
       items: [],
       nextComponent: ""
     }
+    setInterval(this._sendPing.bind(this),2500);
   }
   render() {
     if ( this.state.component == "MainPage" ) {
@@ -114,6 +115,24 @@ export default class App extends React.Component {
     var obj = {};
     obj[param] = value;
     this.setState(obj);
+  }
+  _sendPing() {
+    if ( this.httpDevice.authKey ) {
+      this.httpDevice.transmit(["PING"],output => {
+        if ( output == "error" ) {
+          this.httpDevice.connectionID = null;
+          this.httpDevice.address = null;
+          this.httpDevice.authKey = null;
+          Alert.alert(
+            "MediaPlayer2",
+            "This session has been forcibly disconnected. Try re-logging in to reconnect.",
+            [
+              {text: "OK",onPress: _ => this._setParam("component","LoginPage"),style: "cancel"}
+            ]
+          );
+        }
+      });
+    }
   }
 }
 

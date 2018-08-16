@@ -44,10 +44,10 @@ export default class HTTPDevice {
     this.waiting = false;
   }
   transmit(message,callback,rawMode) {
+    if ( ! this.authKey && ! rawMode ) return;
     var resetWaiting = _ => this.waiting = false;
-    console.log(this.waiting);
-    if ( this.waiting ) return;
-    this.waiting = true;
+    if ( this.waiting && message[0] != "PING" ) return;
+    if ( message[0] != "PING" ) this.waiting = true;
     var cg = new Cryptographer();
     var req = new XMLHttpRequest();
     req.open("POST",`http://${this.address}/receive`);
