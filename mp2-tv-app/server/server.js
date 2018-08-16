@@ -162,7 +162,10 @@ process.on("SIGINT",function() {
     if ( err && err.code != "ENOENT" ) throw err;
     fs.unlink(__dirname + "/outputCmd",function(err) {
       if ( err && err.code != "ENOENT" ) throw err;
-      process.exit();
+      fs.unlink(__dirname + "/connect",function(err) {
+        if ( err && err.code != "ENOENT" ) throw err;
+        process.exit();
+      });
     });
   });
 });
