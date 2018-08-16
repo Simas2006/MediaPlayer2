@@ -1,2 +1,5 @@
 node_modules/
 data/
+server/connect
+server/inputCmd
+server/outputCmd
