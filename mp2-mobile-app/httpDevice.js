@@ -89,8 +89,8 @@ export default class HTTPDevice {
     },true);
   }
   disconnect(callback) {
+    this.connectionID = null;
     this.transmit(["DCONN"],_ => {
-      this.connectionID = null;
       this.address = null;
       this.authKey = null;
       callback();

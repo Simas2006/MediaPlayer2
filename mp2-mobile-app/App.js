@@ -117,7 +117,7 @@ export default class App extends React.Component {
     this.setState(obj);
   }
   _sendPing() {
-    if ( this.httpDevice.authKey ) {
+    if ( this.httpDevice.connectionID ) {
       this.httpDevice.transmit(["PING"],output => {
         if ( output == "error" ) {
           this.httpDevice.connectionID = null;

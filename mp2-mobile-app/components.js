@@ -225,6 +225,7 @@ export class PhotoSelectPage extends React.Component {
           output = output.slice(0,-6);
           warnMode = -1;
         }
+        if ( ! output ) output = this.state.picName;
         this.setState({
           picName: output,
           warnMode: warnMode
@@ -237,6 +238,7 @@ export class PhotoSelectPage extends React.Component {
           output = output.slice(0,-5);
           warnMode = 1;
         }
+        if ( ! output ) output = this.state.picName;
         this.setState({
           picName: output,
           warnMode: warnMode
