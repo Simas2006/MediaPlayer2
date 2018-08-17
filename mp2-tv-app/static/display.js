@@ -1,7 +1,7 @@
 var fs = require("fs");
 var EXIF = require("exif-js");
 var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2" : "/var/local");
-var DATA_LOC = LOCAL_DIR + "/LocalData/";
+var DATA_LOC = LOCAL_DIR + "/LocalData";
 var ihandlers;
 
 function replaceAll(oldChar,newChar,string) {

@@ -2,6 +2,8 @@ var fs = require("fs");
 var CryptoJS = require("crypto-js");
 var express = require("express");
 var app = express();
+var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2" : "/var/local");
+var SERVER_DIR = LOCAL_DIR + "/ServerData";
 var PASSWORD = process.argv[2];
 var PORT = process.argv[3] || 5600;
 var AUTH_KEY = null;
@@ -78,7 +80,7 @@ app.post("/receive",function(request,response) {
         AUTH_KEY = cg.generateKey();
         var toSend = `ok ${cg.encrypt(AUTH_KEY,key)}`;
         response.send(toSend);
-        fs.writeFile(__dirname + "/connect","conn",function(err) {
+        fs.writeFile(SERVER_DIR + "/connect","conn",function(err) {
           if ( err ) throw err;
         });
       } else {
@@ -93,7 +95,7 @@ app.post("/receive",function(request,response) {
         if ( text[0] == "DCONN" ) {
           AUTH_KEY = null;
           response.send("ok");
-          fs.unlink(__dirname + "/connect",function(err) {
+          fs.unlink(SERVER_DIR + "/connect",function(err) {
             if ( err ) throw err;
           });
         } else if ( COMMANDS.indexOf(text[0]) <= -1 ) {
@@ -103,19 +105,19 @@ app.post("/receive",function(request,response) {
             response.send("ok");
             return;
           }
-          fs.unlink(__dirname + "/outputCmd",function(err) {
+          fs.unlink(SERVER_DIR + "/outputCmd",function(err) {
             if ( err && err.code != "ENOENT" ) throw err;
-            fs.writeFile(__dirname + "/inputCmd",text.join(" "),function(err) {
+            fs.writeFile(SERVER_DIR + "/inputCmd",text.join(" "),function(err) {
               if ( err ) throw err;
               var interval = setInterval(function() {
-                fs.readFile(__dirname + "/outputCmd",function(err,data) {
+                fs.readFile(SERVER_DIR + "/outputCmd",function(err,data) {
                   if ( err ) {
                     if ( err.code == "ENOENT" ) return;
                     else throw err;
                   }
-                  fs.unlink(__dirname + "/outputCmd",function(err) {
+                  fs.unlink(SERVER_DIR + "/outputCmd",function(err) {
                     if ( err && err.code != "ENOENT" ) throw err;
-                    fs.unlink(__dirname + "/inputCmd",function(err) {
+                    fs.unlink(SERVER_DIR + "/inputCmd",function(err) {
                       if ( err && err.code != "ENOENT" ) throw err;
                       data = data.toString().trim();
                       if ( data == "ok" || data == "error" ) response.send(data);
@@ -138,14 +140,14 @@ app.get("/blank",function(request,response) {
 });
 
 function checkForForceDCONN() {
-  fs.readFile(__dirname + "/connect",function(err,data) {
+  fs.readFile(SERVER_DIR + "/connect",function(err,data) {
     if ( err ) {
       if ( err.code == "ENOENT" ) return;
       else throw err;
     }
     if ( data.toString().trim() == "dconn" ) {
       AUTH_KEY = null;
-      fs.unlink(__dirname + "/connect",function(err) {
+      fs.unlink(SERVER_DIR + "/connect",function(err) {
         if ( err ) throw err;
       });
     }
@@ -158,11 +160,11 @@ app.listen(PORT,function() {
 });
 
 process.on("SIGINT",function() {
-  fs.unlink(__dirname + "/inputCmd",function(err) {
+  fs.unlink(SERVER_DIR + "/inputCmd",function(err) {
     if ( err && err.code != "ENOENT" ) throw err;
-    fs.unlink(__dirname + "/outputCmd",function(err) {
+    fs.unlink(SERVER_DIR + "/outputCmd",function(err) {
       if ( err && err.code != "ENOENT" ) throw err;
-      fs.unlink(__dirname + "/connect",function(err) {
+      fs.unlink(SERVER_DIR + "/connect",function(err) {
         if ( err && err.code != "ENOENT" ) throw err;
         process.exit();
       });

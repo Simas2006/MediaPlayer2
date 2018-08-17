@@ -1,6 +1,7 @@
 var fs = require("fs");
 var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2" : "/var/local");
 var DATA_LOC = LOCAL_DIR + "/LocalData";
+var SERVER_LOC = LOCAL_DIR + "/ServerData";
 var lastVolume = 0;
 
 function initCommandHandling(handlers) {
@@ -11,7 +12,7 @@ function initCommandHandling(handlers) {
 }
 
 function checkForCommand(handlers) {
-  fs.readFile(__dirname + "/../server/inputCmd",function(err,data) {
+  fs.readFile(SERVER_LOC + "/inputCmd",function(err,data) {
     if ( err ) {
       if ( err.code == "ENOENT" ) return;
       else throw err;
@@ -24,12 +25,12 @@ function checkForCommand(handlers) {
           if ( result instanceof Object ) toWrite = result.map(item => encodeURIComponent(item)).join(",");
           else toWrite = encodeURIComponent(result);
           if ( result.length == 1 ) toWrite += ",";
-          fs.writeFile(__dirname + "/../server/outputCmd",toWrite,function(err) {
+          fs.writeFile(SERVER_LOC + "/outputCmd",toWrite,function(err) {
             if ( err ) throw err;
           });
         });
       } else {
-        fs.writeFile(__dirname + "/../server/outputCmd","error",function(err) {
+        fs.writeFile(SERVER_LOC + "/outputCmd","error",function(err) {
           if ( err ) throw err;
         });
       }
@@ -227,7 +228,7 @@ function parseCommand(command,handlers,callback) {
 }
 
 function getConnectionState(callback) {
-  fs.stat(__dirname + "/../server/connect",function(err) {
+  fs.stat(SERVER_LOC + "/connect",function(err) {
     if ( err ) {
       if ( err.code == "ENOENT" ) callback(false);
       else throw err;
@@ -238,12 +239,12 @@ function getConnectionState(callback) {
 }
 
 function forceDCONN() {
-  fs.stat(__dirname + "/../server/connect",function(err) {
+  fs.stat(SERVER_LOC + "/connect",function(err) {
     if ( err ) {
       if ( err.code == "ENOENT" ) return;
       else throw err;
     }
-    fs.writeFile(__dirname + "/../server/connect","dconn",function(err) {
+    fs.writeFile(SERVER_LOC + "/connect","dconn",function(err) {
       if ( err ) throw err;
     });
   });
