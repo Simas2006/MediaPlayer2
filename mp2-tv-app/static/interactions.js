@@ -8,8 +8,11 @@ var serverProc;
 var lastVolume = 0;
 
 function initCommandHandling(handlers) {
-  serverProc = execFile(__dirname + "/../server.js",["password","5600"],function(err,stdout,stderr) {
-    if ( err ) throw err;
+  fs.unlink(SERVER_LOC + "/shutdown",function(err) {
+    if ( err && err.code != "ENOENT" ) throw err;
+    serverProc = execFile(__dirname + "/../server.js",[],function(err,stdout,stderr) {
+      if ( err ) throw err;
+    });
   });
   setInterval(function() {
     checkForCommand(handlers);

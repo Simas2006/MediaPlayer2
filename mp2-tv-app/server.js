@@ -6,8 +6,8 @@ var express = require("express");
 var app = express();
 var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2" : "/var/local");
 var SERVER_LOC = LOCAL_DIR + "/ServerData";
-var PASSWORD = process.argv[2];
-var PORT = process.argv[3] || 5600;
+var PASSWORD = fs.readFileSync(LOCAL_DIR + "/ServerPassword").toString().trim();
+var PORT = 5600;
 var AUTH_KEY = null;
 
 var COMMANDS = [ // excluding CONN & DCONN
