@@ -1,11 +1,15 @@
 var fs = require("fs");
+var {execFile} = require("child_process");
 var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2" : "/var/local");
 var DATA_LOC = LOCAL_DIR + "/LocalData";
 var SERVER_LOC = LOCAL_DIR + "/ServerData";
+var serverProc;
 var lastVolume = 0;
 
 function initCommandHandling(handlers) {
-  // launch server around here
+  serverProc = execFile(__dirname + "/../server.js",["password","5600"],function(err,stdout,stderr) {
+    if ( err ) throw err;
+  });
   setInterval(function() {
     checkForCommand(handlers);
   },50);

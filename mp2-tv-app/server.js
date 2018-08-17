@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var fs = require("fs");
 var CryptoJS = require("crypto-js");
 var express = require("express");
