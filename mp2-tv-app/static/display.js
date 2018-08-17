@@ -119,6 +119,10 @@ class PhotoAgent {
     this.albumName = null;
     this.albumIndex = 0;
     this.albumFiles = [];
+    this.timeout = 0;
+    setInterval(_ => {
+      this.timeout = Math.max(this.timeout - 1,0);
+    },1);
   }
   render() {
     var calculateRatio = this.calculateRatio;
@@ -159,6 +163,8 @@ class PhotoAgent {
     return this.albumFiles[this.albumIndex];
   }
   eMovePicture(toMove) {
+    if ( this.timeout > 0 ) return decodeURIComponent(this.albumFiles[this.albumIndex]);
+    this.timeout = 10;
     this.albumIndex += toMove;
     var suffix = "";
     if ( this.albumIndex <= -1 ) this.albumIndex = this.albumFiles.length - 1;
