@@ -1,5 +1,6 @@
 var fs = require("fs");
 var EXIF = require("exif-js");
+var shell = require("electron").shell;
 var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2" : "/var/local");
 var DATA_LOC = LOCAL_DIR + "/LocalData";
 var ihandlers;
@@ -200,6 +201,19 @@ function openPage(toOpen) {
     document.getElementById(pages[i] + "Page").className = "hidden";
   }
   document.getElementById(toOpen + "Page").className = "";
+}
+
+function resetAll() {
+  ihandlers.openHome();
+  ihandlers.setQueue([]);
+  ihandlers.playNextSong();
+  ihandlers.setVolume(50);
+  if ( ! ihandlers.isPlaying() ) ihandlers.togglePlay();
+  forceDCONN();
+}
+
+function openFolder() {
+  shell.openItem(DATA_LOC);
 }
 
 /* API Handlers
