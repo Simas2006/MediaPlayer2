@@ -5,7 +5,7 @@ var CryptoJS = require("crypto-js");
 var express = require("express");
 var app = express();
 var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2" : "/var/local");
-var SERVER_DIR = LOCAL_DIR + "/ServerData";
+var SERVER_LOC = LOCAL_DIR + "/ServerData";
 var PASSWORD = process.argv[2];
 var PORT = process.argv[3] || 5600;
 var AUTH_KEY = null;
@@ -82,7 +82,7 @@ app.post("/receive",function(request,response) {
         AUTH_KEY = cg.generateKey();
         var toSend = `ok ${cg.encrypt(AUTH_KEY,key)}`;
         response.send(toSend);
-        fs.writeFile(SERVER_DIR + "/connect","conn",function(err) {
+        fs.writeFile(SERVER_LOC + "/connect","conn",function(err) {
           if ( err ) throw err;
         });
       } else {
@@ -97,7 +97,7 @@ app.post("/receive",function(request,response) {
         if ( text[0] == "DCONN" ) {
           AUTH_KEY = null;
           response.send("ok");
-          fs.unlink(SERVER_DIR + "/connect",function(err) {
+          fs.unlink(SERVER_LOC + "/connect",function(err) {
             if ( err ) throw err;
           });
         } else if ( COMMANDS.indexOf(text[0]) <= -1 ) {
@@ -107,19 +107,19 @@ app.post("/receive",function(request,response) {
             response.send("ok");
             return;
           }
-          fs.unlink(SERVER_DIR + "/outputCmd",function(err) {
+          fs.unlink(SERVER_LOC + "/outputCmd",function(err) {
             if ( err && err.code != "ENOENT" ) throw err;
-            fs.writeFile(SERVER_DIR + "/inputCmd",text.join(" "),function(err) {
+            fs.writeFile(SERVER_LOC + "/inputCmd",text.join(" "),function(err) {
               if ( err ) throw err;
               var interval = setInterval(function() {
-                fs.readFile(SERVER_DIR + "/outputCmd",function(err,data) {
+                fs.readFile(SERVER_LOC + "/outputCmd",function(err,data) {
                   if ( err ) {
                     if ( err.code == "ENOENT" ) return;
                     else throw err;
                   }
-                  fs.unlink(SERVER_DIR + "/outputCmd",function(err) {
+                  fs.unlink(SERVER_LOC + "/outputCmd",function(err) {
                     if ( err && err.code != "ENOENT" ) throw err;
-                    fs.unlink(SERVER_DIR + "/inputCmd",function(err) {
+                    fs.unlink(SERVER_LOC + "/inputCmd",function(err) {
                       if ( err && err.code != "ENOENT" ) throw err;
                       data = data.toString().trim();
                       if ( data == "ok" || data == "error" ) response.send(data);
@@ -142,34 +142,49 @@ app.get("/blank",function(request,response) {
 });
 
 function checkForForceDCONN() {
-  fs.readFile(SERVER_DIR + "/connect",function(err,data) {
+  fs.readFile(SERVER_LOC + "/connect",function(err,data) {
     if ( err ) {
       if ( err.code == "ENOENT" ) return;
       else throw err;
     }
     if ( data.toString().trim() == "dconn" ) {
       AUTH_KEY = null;
-      fs.unlink(SERVER_DIR + "/connect",function(err) {
+      fs.unlink(SERVER_LOC + "/connect",function(err) {
         if ( err ) throw err;
       });
     }
   });
 }
 
-app.listen(PORT,function() {
-  setInterval(checkForForceDCONN,1500);
-  console.log("Listening on port " + PORT);
-});
-
-process.on("SIGINT",function() {
-  fs.unlink(SERVER_DIR + "/inputCmd",function(err) {
-    if ( err && err.code != "ENOENT" ) throw err;
-    fs.unlink(SERVER_DIR + "/outputCmd",function(err) {
-      if ( err && err.code != "ENOENT" ) throw err;
-      fs.unlink(SERVER_DIR + "/connect",function(err) {
+function checkForShutdown() {
+  fs.stat(SERVER_LOC + "/shutdown",function(err) {
+    if ( err ) {
+      if ( err.code == "ENOENT" ) return;
+      else throw err;
+    }
+    AUTH_KEY = null;
+    setTimeout(function() {
+      fs.unlink(SERVER_LOC + "/shutdown",function(err) {
         if ( err && err.code != "ENOENT" ) throw err;
-        process.exit();
+        fs.unlink(SERVER_LOC + "/inputCmd",function(err) {
+          if ( err && err.code != "ENOENT" ) throw err;
+          fs.unlink(SERVER_LOC + "/outputCmd",function(err) {
+            if ( err && err.code != "ENOENT" ) throw err;
+            fs.unlink(SERVER_LOC + "/connect",function(err) {
+              if ( err && err.code != "ENOENT" ) throw err;
+              process.exit();
+            });
+          });
+        });
       });
-    });
+    },1500);
   });
+}
+
+app.listen(PORT,function() {
+  setInterval(function() {
+    checkForForceDCONN();
+    checkForShutdown();
+  },1500);
+  console.log("Listening on port " + PORT);
 });

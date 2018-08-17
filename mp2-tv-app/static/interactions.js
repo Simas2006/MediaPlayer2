@@ -1,5 +1,6 @@
 var fs = require("fs");
 var {execFile} = require("child_process");
+var remote = require("electron").remote;
 var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2" : "/var/local");
 var DATA_LOC = LOCAL_DIR + "/LocalData";
 var SERVER_LOC = LOCAL_DIR + "/ServerData";
@@ -13,6 +14,11 @@ function initCommandHandling(handlers) {
   setInterval(function() {
     checkForCommand(handlers);
   },50);
+  remote.getCurrentWindow().on("close",function(event) {
+    fs.writeFile(SERVER_LOC + "/shutdown","",function(err) {
+      if ( err ) throw err;
+    });
+  });
 }
 
 function checkForCommand(handlers) {
