@@ -307,6 +307,7 @@ export class QueuePage extends React.Component {
       volume: 0,
       queue: []
     }
+    this.getqPing = setInterval(_ => this._mapCommandToQueue(["GETQ"]),1500);
   }
   componentWillMount() {
     this.props.httpDevice.transmit(["GETQ"],output => {
@@ -322,9 +323,7 @@ export class QueuePage extends React.Component {
     return (
       <View>
         <Text style={styles.bigText}>MediaPlayer2</Text>
-        <TouchableOpacity onPress={_ => this._mapCommandToQueue(["GETQ"])} style={styles.fullWidth}>
-          <Text style={styles.titleText}>{"Now Playing: " + (formatSongName(this.state.queue[0]) || "Nothing!")}</Text>
-        </TouchableOpacity>
+        <Text style={styles.titleText}>Now Playing: {formatSongName(this.state.queue[0]) || "Nothing!"}</Text>
         <View style={styles.buttonPanel}>
           <Button
             text={"\u23ea"}
@@ -380,7 +379,7 @@ export class QueuePage extends React.Component {
           />
           <Button
             text="Back"
-            onPress={_ => this.props.setParam("component","MainPage")}
+            onPress={_ => this._exitPage()}
             style={styles.titleText}
             specialWidth={styles.thirdButton}
           />
@@ -435,7 +434,7 @@ export class QueuePage extends React.Component {
   }
   _mapCommandToQueue(command) {
     this.props.httpDevice.transmit(command,output => {
-      if ( ! output ) return;
+      if ( ! output || output == "error" ) return;
       this.setState({
         queue: output.slice(1)
       });
@@ -447,6 +446,10 @@ export class QueuePage extends React.Component {
         volume: output
       });
     });
+  }
+  _exitPage() {
+    clearInterval(this.getqPing);
+    this.props.setParam("component","MainPage");
   }
 }
 
