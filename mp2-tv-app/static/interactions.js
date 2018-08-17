@@ -175,11 +175,7 @@ function parseCommand(command,handlers,callback) {
   } else if ( commandName == "UPSQ" ) {
     var queue = handlers.getQueue();
     var fromIndex = parseInt(command[1]);
-    if ( fromIndex <= 0 || fromIndex >= queue.length ) {
-      callback("error");
-      return;
-    }
-    if ( fromIndex == 1 ) {
+    if ( fromIndex <= 1 || fromIndex >= queue.length ) {
       callback([(handlers.isPlaying() ? "playing" : "paused") + ":" + handlers.getVolume()].concat(handlers.getQueue()));
       return;
     }
@@ -193,7 +189,7 @@ function parseCommand(command,handlers,callback) {
     var queue = handlers.getQueue();
     var fromIndex = parseInt(command[1]);
     if ( fromIndex <= 0 || fromIndex >= queue.length ) {
-      callback("error");
+      callback([(handlers.isPlaying() ? "playing" : "paused") + ":" + handlers.getVolume()].concat(handlers.getQueue()));
       return;
     }
     var toIndex = fromIndex + 1;
@@ -204,7 +200,7 @@ function parseCommand(command,handlers,callback) {
     var queue = handlers.getQueue();
     var index = parseInt(command[1]);
     if ( index <= 0 || index >= queue.length ) {
-      callback("error");
+      callback([(handlers.isPlaying() ? "playing" : "paused") + ":" + handlers.getVolume()].concat(handlers.getQueue()));
       return;
     }
     queue.splice(index,1);
