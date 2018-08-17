@@ -1,5 +1,6 @@
 var fs = require("fs");
-var DATA_LOC = __dirname + "/../data";
+var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2" : "/var/local");
+var DATA_LOC = LOCAL_DIR + "/LocalData";
 var lastVolume = 0;
 
 function initCommandHandling(handlers) {

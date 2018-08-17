@@ -1,5 +1,7 @@
 var fs = require("fs");
 var EXIF = require("exif-js");
+var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2" : "/var/local");
+var DATA_LOC = LOCAL_DIR + "/LocalData/";
 var ihandlers;
 
 function replaceAll(oldChar,newChar,string) {
@@ -55,7 +57,7 @@ class MusicAgent {
   triggerNextSong(newElements) {
     if ( ! newElements ) this.queue.splice(0,1);
     if ( this.queue[0] ) {
-      this.audio.src = replaceAll("#","%23",replaceAll("?","%3F",__dirname + "/../data/" + this.queue[0]));
+      this.audio.src = replaceAll("#","%23",replaceAll("?","%3F",DATA_LOC + "/" + this.queue[0]));
       this.audio.play();
     } else {
       this.audio.src = "";
@@ -129,7 +131,7 @@ class PhotoAgent {
     document.getElementById("pictureName").innerText = decodeURIComponent(this.albumFiles[this.albumIndex]);
     var picture = document.getElementById("picture");
     var img = new Image();
-    img.src = replaceAll("#","%23",replaceAll("?","%3F",__dirname + "/../data/" + this.albumName + "/" + this.albumFiles[this.albumIndex]));
+    img.src = replaceAll("#","%23",replaceAll("?","%3F",DATA_LOC + "/" + this.albumName + "/" + this.albumFiles[this.albumIndex]));
     img.onload = function() {
       EXIF.getData(img,function() {
         var orientation = EXIF.getTag(this,"Orientation");
@@ -158,7 +160,7 @@ class PhotoAgent {
     openPage("photo");
     this.albumName = album;
     this.albumIndex = 0;
-    this.albumFiles = fs.readdirSync(__dirname + "/../data/" + album).filter(item => ["jpg","png","gif"].map(jtem => item.toLowerCase().endsWith(jtem) ? "1" : "0").indexOf("1") > -1);
+    this.albumFiles = fs.readdirSync(DATA_LOC + "/" + album).filter(item => ["jpg","png","gif"].map(jtem => item.toLowerCase().endsWith(jtem) ? "1" : "0").indexOf("1") > -1);
     this.render();
     return this.albumFiles[this.albumIndex];
   }
