@@ -55,7 +55,7 @@ class MusicAgent {
   triggerNextSong(newElements) {
     if ( ! newElements ) this.queue.splice(0,1);
     if ( this.queue[0] ) {
-      this.audio.src = __dirname + "/../data/" + replaceAll("#","%23",replaceAll("?","%3F",this.queue[0]));
+      this.audio.src = replaceAll("#","%23",replaceAll("?","%3F",__dirname + "/../data/" + this.queue[0]));
       this.audio.play();
     } else {
       this.audio.src = "";
@@ -125,7 +125,7 @@ class PhotoAgent {
     document.getElementById("pictureName").innerText = decodeURIComponent(this.albumFiles[this.albumIndex]);
     var picture = document.getElementById("picture");
     var img = new Image();
-    img.src = __dirname + "/../data/" + this.albumName + "/" + this.albumFiles[this.albumIndex];
+    img.src = replaceAll("#","%23",replaceAll("?","%3F",__dirname + "/../data/" + this.albumName + "/" + this.albumFiles[this.albumIndex]));
     img.onload = function() {
       EXIF.getData(img,function() {
         var orientation = EXIF.getTag(this,"Orientation");
