@@ -322,7 +322,9 @@ export class QueuePage extends React.Component {
     return (
       <View>
         <Text style={styles.bigText}>MediaPlayer2</Text>
-        <Text style={styles.titleText}>Now Playing: {formatSongName(this.state.queue[0]) || "Nothing!"}</Text>
+        <TouchableOpacity onPress={_ => this._mapCommandToQueue(["GETQ"])} style={styles.fullWidth}>
+          <Text style={styles.titleText}>{"Now Playing: " + (formatSongName(this.state.queue[0]) || "Nothing!")}</Text>
+        </TouchableOpacity>
         <View style={styles.buttonPanel}>
           <Button
             text={"\u23ea"}
