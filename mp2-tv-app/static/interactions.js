@@ -18,9 +18,7 @@ function initCommandHandling(handlers) {
     checkForCommand(handlers);
   },50);
   remote.getCurrentWindow().on("close",function(event) {
-    fs.writeFile(SERVER_LOC + "/shutdown","",function(err) {
-      if ( err ) throw err;
-    });
+    fs.writeFileSync(SERVER_LOC + "/shutdown","");
   });
 }
 
