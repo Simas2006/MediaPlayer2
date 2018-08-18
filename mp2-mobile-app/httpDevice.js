@@ -50,8 +50,9 @@ export default class HTTPDevice {
     if ( message[0] != "PING" ) this.waiting = true;
     var cg = new Cryptographer();
     var req = new XMLHttpRequest();
-    req.open("POST",`http://${this.address}/receive`);
     var authKey = this.authKey;
+    req.timeout = 2000;
+    req.open("POST",`http://${this.address}/receive`);
     req.onload = function() {
       resetWaiting();
       if ( rawMode ) {
@@ -65,6 +66,10 @@ export default class HTTPDevice {
           else callback(plaintext);
         }
       }
+    }
+    req.ontimeout = function() {
+      resetWaiting();
+      callback("error");
     }
     if ( rawMode ) req.send(message);
     else req.send(cg.encrypt(message.map(item => encodeURIComponent(item)).join(" "),this.authKey));
