@@ -13,13 +13,13 @@
       fs.writeFile(LOCAL_DIR + "/ServerPassword",password,function(err) {
         if ( err ) throw err;
         fs.mkdir(LOCAL_DIR + "/LocalData",function(err) {
-          if ( err && err.code != "ENOENT" ) throw err;
+          if ( err && err.code != "EEXIST" ) throw err;
           fs.mkdir(LOCAL_DIR + "/LocalData/photos",function(err) {
-            if ( err && err.code != "ENOENT" ) throw err;
+            if ( err && err.code != "EEXIST" ) throw err;
             fs.mkdir(LOCAL_DIR + "/LocalData/music",function(err) {
-              if ( err && err.code != "ENOENT" ) throw err;
+              if ( err && err.code != "EEXIST" ) throw err;
               fs.mkdir(LOCAL_DIR + "/ServerData",function(err) {
-                if ( err && err.code != "ENOENT" ) throw err;
+                if ( err && err.code != "EEXIST" ) throw err;
                 location.href = __dirname + "/index.html";
               });
             });

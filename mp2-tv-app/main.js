@@ -1,5 +1,6 @@
 var {app,BrowserWindow,globalShortcut,Menu} = require("electron");
 var fs = require("fs");
+var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2" : "/var/local");
 var window;
 
 function createWindow() {
@@ -12,10 +13,17 @@ function createWindow() {
       webSecurity: false
     }
   });
-  window.loadURL(`file://${__dirname}/static/index.html`);
   window.webContents.openDevTools();
   window.on("closed",function() {
     window = null;
+  });
+  fs.stat(LOCAL_DIR + "/ServerPassword",function(err) {
+    var path = "index";
+    if ( err ) {
+      if ( err.code == "ENOENT" ) path = "prompt";
+      else throw err;
+    }
+    window.loadURL(`file://${__dirname}/static/${path}.html`);
   });
 }
 
