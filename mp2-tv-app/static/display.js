@@ -143,6 +143,7 @@ class PhotoAgent {
         picture.height = img.height * ratio;
         picture.onload = function() {
           picture.style.transform = `rotate(${rotation}deg)`;
+          picture.style.display = "inline";
         }
       });
     }
@@ -254,6 +255,7 @@ window.onload = function() {
     openURL:      wagent.eOpenURL.bind(wagent),
     openHome:     _ => {
       openPage("queue");
+      document.getElementById("picture").style.display = "none";
       magent.render();
     }
   }
