@@ -20,6 +20,7 @@ export default class App extends React.Component {
       component: "LoginPage",
       path: [],
       items: [],
+      interval: -1,
       nextComponent: ""
     }
     setInterval(this._sendPing.bind(this),1500);
@@ -104,6 +105,7 @@ export default class App extends React.Component {
             path={this.state.path}
             items={this.state.items}
             nextComponent={this.state.nextComponent}
+            interval={this.state.interval}
             setParam={this._setParam.bind(this)}
             httpDevice={this.httpDevice}
           />
@@ -113,6 +115,10 @@ export default class App extends React.Component {
   }
   _setParam(param,value) {
     var obj = {};
+    if ( this.state.interval > -1 ) {
+      clearInterval(this.state.interval);
+      obj.interval = -1;
+    }
     obj[param] = value;
     this.setState(obj);
   }

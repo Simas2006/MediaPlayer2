@@ -318,6 +318,7 @@ export class QueuePage extends React.Component {
         queue: output.slice(1)
       });
     });
+    this.props.setParam("interval",this.getqPing);
   }
   render() {
     return (
@@ -421,6 +422,7 @@ export class QueuePage extends React.Component {
               );
             })
           }
+          <Text>{"\n"}</Text>
         </View>
       </View>
     );
@@ -448,7 +450,6 @@ export class QueuePage extends React.Component {
     });
   }
   _exitPage() {
-    clearInterval(this.getqPing);
     this.props.setParam("component","MainPage");
   }
 }
