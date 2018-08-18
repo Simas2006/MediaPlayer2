@@ -12,6 +12,10 @@ webview {
   text-align: center;
   overflow: hidden;
 }
+#password {
+  height: 20px;
+  font-size: 100%;
+}
 .bold {
   font-weight: bold;
 }
