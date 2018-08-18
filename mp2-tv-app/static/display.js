@@ -231,6 +231,11 @@ function openFolder() {
  * - openHome √
  */
 
+window.onkeypress = function(event) {
+  if ( event.code == "KeyD" ) forceDCONN();
+  else if ( event.code == "KeyR" ) resetAll();
+}
+
 window.onload = function() {
   var magent = new MusicAgent();
   var pagent = new PhotoAgent();
