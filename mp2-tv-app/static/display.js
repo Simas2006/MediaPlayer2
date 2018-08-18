@@ -167,7 +167,7 @@ class PhotoAgent {
   }
   eMovePicture(toMove) {
     if ( this.timeout > 0 ) return decodeURIComponent(this.albumFiles[this.albumIndex]);
-    this.timeout = 10;
+    this.timeout = 100;
     this.albumIndex += toMove;
     var suffix = "";
     if ( this.albumIndex <= -1 ) this.albumIndex = this.albumFiles.length - 1;
