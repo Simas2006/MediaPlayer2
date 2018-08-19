@@ -10,17 +10,20 @@
     var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2" : "/var/local");
     function createPassword() {
       var password = document.getElementById("password").value;
-      fs.writeFile(LOCAL_DIR + "/ServerPassword",password,function(err) {
-        if ( err ) throw err;
-        fs.mkdir(LOCAL_DIR + "/LocalData",function(err) {
-          if ( err && err.code != "EEXIST" ) throw err;
-          fs.mkdir(LOCAL_DIR + "/LocalData/photos",function(err) {
+      fs.mkdir(LOCAL_DIR,function(err) {
+        if ( err && err.code != "EEXIST" ) throw err;
+        fs.writeFile(LOCAL_DIR + "/ServerPassword",password,function(err) {
+          if ( err ) throw err;
+          fs.mkdir(LOCAL_DIR + "/LocalData",function(err) {
             if ( err && err.code != "EEXIST" ) throw err;
-            fs.mkdir(LOCAL_DIR + "/LocalData/music",function(err) {
+            fs.mkdir(LOCAL_DIR + "/LocalData/photos",function(err) {
               if ( err && err.code != "EEXIST" ) throw err;
-              fs.mkdir(LOCAL_DIR + "/ServerData",function(err) {
+              fs.mkdir(LOCAL_DIR + "/LocalData/music",function(err) {
                 if ( err && err.code != "EEXIST" ) throw err;
-                location.href = __dirname + "/index.html";
+                fs.mkdir(LOCAL_DIR + "/ServerData",function(err) {
+                  if ( err && err.code != "EEXIST" ) throw err;
+                  location.href = __dirname + "/index.html";
+                });
               });
             });
           });
