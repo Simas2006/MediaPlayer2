@@ -4,7 +4,8 @@
   "description": "TV app for MP2",
   "main": "main.js",
   "scripts": {
-    "test": "electron ."
+    "test": "electron .",
+    "build": "rm -r dist; electron-builder ."
   },
   "build": {
     "asar": false
