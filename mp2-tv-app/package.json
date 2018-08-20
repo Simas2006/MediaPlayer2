@@ -6,13 +6,18 @@
   "scripts": {
     "test": "electron ."
   },
+  "build": {
+    "asar": false
+  },
   "author": "Simas Juknelis",
   "license": "MIT",
   "dependencies": {
     "crypto-js": "^3.1.9-1",
-    "electron": "^2.0.6",
     "exif-js": "^2.3.0",
     "express": "^4.16.3",
     "ip": "^1.1.5"
+  },
+  "devDependencies": {
+    "electron": "^2.0.6"
   }
 }
