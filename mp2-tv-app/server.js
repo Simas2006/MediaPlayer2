@@ -128,7 +128,7 @@ app.post("/receive",function(request,response) {
                   });
                   clearInterval(interval);
                 });
-              },50);
+              },150);
             });
           });
         }
