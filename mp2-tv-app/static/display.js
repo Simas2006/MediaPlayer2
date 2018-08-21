@@ -235,6 +235,7 @@ function openFolder() {
 window.onkeypress = function(event) {
   if ( event.code == "KeyD" ) forceDCONN();
   else if ( event.code == "KeyR" ) resetAll();
+  else if ( event.code == "KeyO" ) openFolder();
 }
 
 window.onload = function() {
