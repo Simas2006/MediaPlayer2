@@ -8,27 +8,22 @@
     var fs = require("fs");
     var ip = require("ip");
     var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2" : "/var/local");
-    function createPassword() {
+    function captureErrors(func) {
+      try {
+        func();
+      } catch ( err ) {
+        if ( err.code != "EEXIST" && err.code != "ENOENT" ) throw err;
+      }
+    }
+    function initializeData() {
       var password = document.getElementById("password").value;
-      fs.mkdir(LOCAL_DIR,function(err) {
-        if ( err && err.code != "EEXIST" ) throw err;
-        fs.writeFile(LOCAL_DIR + "/ServerPassword",password,function(err) {
-          if ( err ) throw err;
-          fs.mkdir(LOCAL_DIR + "/LocalData",function(err) {
-            if ( err && err.code != "EEXIST" ) throw err;
-            fs.mkdir(LOCAL_DIR + "/LocalData/photos",function(err) {
-              if ( err && err.code != "EEXIST" ) throw err;
-              fs.mkdir(LOCAL_DIR + "/LocalData/music",function(err) {
-                if ( err && err.code != "EEXIST" ) throw err;
-                fs.mkdir(LOCAL_DIR + "/ServerData",function(err) {
-                  if ( err && err.code != "EEXIST" ) throw err;
-                  location.href = __dirname + "/index.html";
-                });
-              });
-            });
-          });
-        });
-      });
+      captureErrors(_ => fs.mkdirSync(LOCAL_DIR));
+      captureErrors(_ => fs.writeFileSync(LOCAL_DIR + "/ServerPassword",password));
+      captureErrors(_ => fs.mkdirSync(LOCAL_DIR + "/LocalData"));
+      captureErrors(_ => fs.mkdirSync(LOCAL_DIR + "/LocalData/photos"));
+      captureErrors(_ => fs.mkdirSync(LOCAL_DIR + "/LocalData/music"));
+      captureErrors(_ => fs.mkdirSync(LOCAL_DIR + "/ServerData"));
+      location.href = __dirname + "/index.html";
     }
     window.onload = function() {
       var addr = ip.address().split(".");
@@ -43,7 +38,7 @@
     <p>
       Welcome to MediaPlayer2!<br />
       Please create a password to be used to login to the app.<br /><br />
-      <input type="password" id="password" placeholder="Password" onchange="createPassword()" /><br /><br />
+      <input type="password" id="password" placeholder="Password" onchange="initializeData()" /><br /><br />
       <span id="serverID"></span>
     </p>
   </div>
