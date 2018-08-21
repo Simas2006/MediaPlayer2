@@ -90,7 +90,7 @@ app.post("/receive",function(request,response) {
       }
     } else {
       var text = cg.decrypt(data,AUTH_KEY);
-      if ( text == "decrypt-failed" ) {
+      if ( text == "decrypt-failed" || text.indexOf("..") > -1 ) {
         response.send("error");
       } else {
         text = text.split(" ");
