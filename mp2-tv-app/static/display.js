@@ -14,11 +14,16 @@ class MusicAgent {
     this.queue = [];
     this.playing = true;
     this.volume = 50;
+    this.volumeTimeout = 0;
     this.audio = document.getElementById("audio");
+    this.audio.volume = 0.5;
     this.audio.onended = function() {
       this.triggerNextSong(false);
     }.bind(this);
     setInterval(this.updateTimeInfo.bind(this),1000);
+    setInterval(_ => {
+      this.volumeTimeout = Math.max(this.volumeTimeout - 1,0);
+    },1);
   }
   render() {
     if ( this.playing ) document.getElementById("paused").innerText = "";
@@ -112,6 +117,8 @@ class MusicAgent {
     return this.volume;
   }
   eSetVolume(newVolume) {
+    if ( this.volumeTimeout > 0 ) return;
+    this.volumeTimeout = 100;
     this.volume = newVolume;
     this.audio.volume = newVolume / 100;
   }

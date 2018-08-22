@@ -6,6 +6,7 @@ var DATA_LOC = LOCAL_DIR + "/LocalData";
 var SERVER_LOC = LOCAL_DIR + "/ServerData";
 var serverProc;
 var lastVolume = 0;
+var addTimeout = 0;
 
 function initCommandHandling(handlers) {
   fs.unlink(SERVER_LOC + "/shutdown",function(err) {
@@ -16,6 +17,7 @@ function initCommandHandling(handlers) {
   });
   setInterval(function() {
     checkForCommand(handlers);
+    addTimeout = Math.max(addTimeout - 1,0);
   },50);
   remote.getCurrentWindow().on("close",function(event) {
     fs.writeFileSync(SERVER_LOC + "/shutdown","");
@@ -138,6 +140,8 @@ function parseCommand(command,handlers,callback) {
       callback("directory");
     });
   } else if ( commandName == "ADDTQ" ) {
+    if ( addTimeout > 0 ) return;
+    addTimeout = 3;
     var queue = handlers.getQueue();
     queue = queue.concat(command.slice(2).map(item => command[1] + "/" + item));
     handlers.setQueue(queue);
@@ -167,12 +171,12 @@ function parseCommand(command,handlers,callback) {
     var vol = handlers.getVolume();
     vol = Math.min(vol + 5,100);
     handlers.setVolume(vol);
-    callback(vol);
+    callback(handlers.getVolume());
   } else if ( commandName == "DWNVL" ) {
     var vol = handlers.getVolume();
     vol = Math.max(vol - 5,0);
     handlers.setVolume(vol);
-    callback(vol);
+    callback(handlers.getVolume());
   } else if ( commandName == "MUTVL" ) {
     var vol = handlers.getVolume();
     if ( vol > 0 ) {
@@ -182,7 +186,7 @@ function parseCommand(command,handlers,callback) {
       vol = lastVolume;
     }
     handlers.setVolume(vol);
-    callback(vol);
+    callback(handlers.getVolume());
   } else if ( commandName == "GETQ" ) {
     callback([(handlers.isPlaying() ? "playing" : "paused") + ":" + handlers.getVolume()].concat(handlers.getQueue()));
   } else if ( commandName == "UPSQ" ) {
