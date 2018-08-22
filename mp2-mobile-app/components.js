@@ -436,7 +436,7 @@ export class QueuePage extends React.Component {
   }
   _mapCommandToQueue(command) {
     this.props.httpDevice.transmit(command,output => {
-      if ( ! output || output == "error" ) return;
+      if ( ! output || ! Array.isArray(output) ) return;
       this.setState({
         queue: output.slice(1)
       });
@@ -444,6 +444,7 @@ export class QueuePage extends React.Component {
   }
   _mapCommandToVolume(command) {
     this.props.httpDevice.transmit(command,output => {
+      if ( isNaN(parseInt(output)) ) return;
       this.setState({
         volume: output
       });

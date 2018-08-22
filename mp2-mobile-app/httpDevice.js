@@ -59,7 +59,7 @@ export default class HTTPDevice {
         callback(this.responseText);
       } else {
         if ( this.responseText == "ok" || this.responseText == "error" ) {
-          callback(this.responseText);
+          if ( this.responseText == "ok" || message[0] == "PING" ) callback(this.responseText);
         } else {
           var plaintext = cg.decrypt(this.responseText,authKey);
           if ( plaintext.split(",").length > 1 ) callback(plaintext.split(",").filter(item => item).map(item => decodeURIComponent(item)));
@@ -69,7 +69,7 @@ export default class HTTPDevice {
     }
     req.ontimeout = function() {
       resetWaiting();
-      callback("error");
+      if ( rawMode || message[0] == "PING" ) callback("error");
     }
     if ( rawMode ) req.send(message);
     else req.send(cg.encrypt(message.map(item => encodeURIComponent(item)).join(" "),this.authKey));
