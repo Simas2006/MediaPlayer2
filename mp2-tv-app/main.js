@@ -7,11 +7,7 @@ function createWindow() {
   var size = require("electron").screen.getPrimaryDisplay().size;
   window = new BrowserWindow({
     width: size.width,
-    height: size.height,
-    nodeIntegration: "iframe",
-    webPreferences: {
-      webSecurity: false
-    }
+    height: size.height
   });
   //window.webContents.openDevTools();
   window.on("closed",function() {
