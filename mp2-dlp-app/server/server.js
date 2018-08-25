@@ -2,7 +2,12 @@ var fs = require("fs");
 var crypto = require("crypto");
 var express = require("express");
 var app = express();
-var PORT = process.argv[2] || 5601;
+var PASSWORD = process.argv[2];
+var PORT = process.argv[3] || 5601;
+var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2" : "/var/local");
+var PHOTO_LOC = LOCAL_DIR + "/LocalData/photos";
+
+if ( ! PASSWORD ) throw new Error("No password provided");
 
 class Cryptographer {
   encrypt(text,key) {
@@ -29,9 +34,25 @@ class Cryptographer {
   }
 }
 
-app.get("/receive",function(request,response) {
-  var cg = new Cryptographer();
-  response.send(cg.decrypt("c072ed11edef1424f041baff6f321f2a89f0d19f17772fbd7aa98189f7e4742a15342c60a939788415870f0c1549ac73:055a1a8db7de1029d8c6b21bd61d2b9e","sagebeige"));
+app.post("/receive",function(request,response) {
+  var data = "";
+  request.on("data",function(chunk) {
+    data += chunk;
+  });
+  request.on("end",function() {
+    var cg = new Cryptographer();
+    var message = cg.decrypt(data,PASSWORD).split(" ");
+    if ( message[0] == "decrypt-failed" ) {
+      response.send("error");
+    } else {
+      if ( message[0] == "LIST" ) {
+        fs.readdir(PHOTO_LOC,function(err,files) {
+          if ( err ) throw err;
+          response.send(files.filter(item => ! item.startsWith(".")).map(item => encodeURIComponent(item)).join(","));
+        });
+      }
+    }
+  });
 });
 
 app.get("/blank",function(request,response) {
@@ -40,4 +61,6 @@ app.get("/blank",function(request,response) {
 
 app.listen(PORT,function() {
   console.log("Listening on port " + PORT);
+  var cg = new Cryptographer();
+  console.log(cg.encrypt("LIST",PASSWORD));
 });
