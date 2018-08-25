@@ -36,7 +36,7 @@ SHFLQ                      ; Shuffles the queue. Returns "ok" normally.
 
 --- DLP Command Spec ---
 LIST                       ; Returns a comma-separated list of all photo albums normally.
-DWNLD <album>              ; Returns an (encrypted) GZIP corresponding to the album data normally.
+DWNLD <album>              ; Returns an (encrypted) zip file corresponding to the album data normally.
 
 --- Layer Spec ---
 Mobile App Front-End (shows choices to user)
