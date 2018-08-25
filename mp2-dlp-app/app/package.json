@@ -1,0 +1,15 @@
+{
+  "name": "MediaPlayer-dlp",
+  "version": "1.0.0",
+  "description": "Local app for MP2-DLP",
+  "main": "main.js",
+  "scripts": {
+    "test": "electron ."
+  },
+  "author": "Simas Juknelis",
+  "license": "MIT",
+  "dependencies": {
+    "electron": "^2.0.8",
+    "request": "^2.88.0"
+  }
+}
