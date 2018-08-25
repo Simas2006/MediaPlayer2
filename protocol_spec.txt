@@ -1,7 +1,8 @@
 --- Cryptography Spec ---
 All message sent to the server must be encrypted using AES with an initialization vector. Messages returned from the server must be encrypted unless their contents are "ok" or "error".
-The CONN command must be in the plaintext format "CONN <the text 'mp2-authentication' encrypted using the password>".
+The CONN command must be in the plaintext format "CONN <the text 'mp2-authentication' (or 'mp2-dlp-authentication' if using DLP) encrypted using the password>".
 After the DCONN command is issued, the authentication key will be considered to be invalid until it is reused with a CONN command.
+When using DLP, due to the small amount of commands, the password (filtered by an alternate cryptographer using the built-in crypto library) will be used as the key, as the CONN and DCONN commands are not present.
 
 --- Command Spec ---
 CONN                       ; Creates an authentication key to be returned to the client to be used in place of the password in normal communications. Is the first message sent to the server. Fails if there is already a connection which has not DCONN'd yet. See the cryptography spec for details.
@@ -22,7 +23,7 @@ PLYPS                      ; Plays (or pauses) the current song. Returns "ok" no
 PNSNG                      ; Plays the next song in the queue. If the queue is empty, will stop playing altogether. Returns the same result as GETQ.
 RWIND                      ; Rewinds the current song to position 0. Returns "ok" normally.
 
-UPVL                      ; Increments the volume by 5%. Returns the new volume normally.
+UPVL                       ; Increments the volume by 5%. Returns the new volume normally.
 DWNVL                      ; Decrements the volume by 5%. Returns the new volume normally.
 MUTVL                      ; Mutes and unmutes the volume. Returns the new volume normally.
 
@@ -32,6 +33,10 @@ DWNSQ <index>              ; Moves the indexed song in the queue downward one so
 DELSQ <index>              ; Removes the indexed song from the queue. Returns the same result as GETQ.
 CLRQ                       ; Clears the queue and triggers PNSNG. Returns "ok" normally.
 SHFLQ                      ; Shuffles the queue. Returns "ok" normally.
+
+--- DLP Command Spec ---
+LIST                       ; Returns a comma-separated list of all photo albums normally.
+DWNLD <album>              ; Returns an (encrypted) GZIP corresponding to the album data normally.
 
 --- Layer Spec ---
 Mobile App Front-End (shows choices to user)
