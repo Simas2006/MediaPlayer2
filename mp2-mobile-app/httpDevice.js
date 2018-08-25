@@ -1,7 +1,8 @@
 import CryptoJS from 'crypto-js'
 
-const IP_PREFIX = "10.0.1.";
-const PORT      = 5600;
+const IP_PREFIX  = "10.0.1.";
+const PORT       = 5600;
+const DEBUG_MODE = false;
 
 class Cryptographer {
   encrypt(message,key) {
@@ -58,10 +59,12 @@ export default class HTTPDevice {
       if ( rawMode ) {
         callback(this.responseText);
       } else {
+        if ( DEBUG_MODE ) console.log("command:",message);
         if ( this.responseText == "ok" || this.responseText == "error" ) {
           if ( this.responseText == "ok" || message[0] == "PING" ) callback(this.responseText);
         } else {
           var plaintext = cg.decrypt(this.responseText,authKey);
+          if ( DEBUG_MODE ) console.log("recieved:",plaintext);
           if ( plaintext.split(",").length > 1 ) callback(plaintext.split(",").filter(item => item).map(item => decodeURIComponent(item)));
           else callback(plaintext);
         }

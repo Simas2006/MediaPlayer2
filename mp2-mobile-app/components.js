@@ -201,7 +201,7 @@ export class PhotoSelectPage extends React.Component {
             onPress={_ => this._movePicture("left")}
             style={styles.largeText}
           />
-          <Text style={styles.largeText}>{decodeURIComponent(this.state.picName)}</Text>
+          <Text style={styles.largeText}>{decodeURIComponent(this.state.picName || " ")}</Text>
           <Button
             text={"\u25b6"}
             onPress={_ => this._movePicture("right")}
@@ -307,6 +307,10 @@ export class QueuePage extends React.Component {
       volume: 0,
       queue: []
     }
+    this.timeout = 0;
+    this.timeoutInt = setInterval(_ => {
+      this.timeout = Math.max(this.timeout - 1,0);
+    },10);
     this.getqPing = setInterval(_ => this._mapCommandToQueue(["GETQ"]),1500);
   }
   componentWillMount() {
@@ -318,7 +322,7 @@ export class QueuePage extends React.Component {
         queue: output.slice(1)
       });
     });
-    this.props.setParam("interval",this.getqPing);
+    this.props.setParam("interval",[this.timeoutInt,this.getqPing]);
   }
   render() {
     return (
@@ -435,6 +439,8 @@ export class QueuePage extends React.Component {
     });
   }
   _mapCommandToQueue(command) {
+    if ( this.timeout > 0 && command[0] != "GETQ" ) return;
+    if ( command[0] != "GETQ" ) this.timeout = 5;
     this.props.httpDevice.transmit(command,output => {
       if ( ! output || ! Array.isArray(output) ) return;
       this.setState({

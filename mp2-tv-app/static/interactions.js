@@ -7,6 +7,7 @@ var SERVER_LOC = LOCAL_DIR + "/ServerData";
 var serverProc;
 var lastVolume = 0;
 var addTimeout = 0;
+var genTimeout = 0;
 
 function initCommandHandling(handlers) {
   fs.unlink(SERVER_LOC + "/shutdown",function(err) {
@@ -17,8 +18,11 @@ function initCommandHandling(handlers) {
   });
   setInterval(function() {
     checkForCommand(handlers);
-    addTimeout = Math.max(addTimeout - 1,0);
   },50);
+  setInterval(function() {
+    addTimeout = Math.max(addTimeout - 1,0);
+    genTimeout = Math.max(genTimeout - 1,0);
+  },1);
   remote.getCurrentWindow().on("close",function(event) {
     fs.writeFileSync(SERVER_LOC + "/shutdown","");
   });
@@ -141,7 +145,7 @@ function parseCommand(command,handlers,callback) {
     });
   } else if ( commandName == "ADDTQ" ) {
     if ( addTimeout > 0 ) return;
-    addTimeout = 3;
+    addTimeout = 150;
     var queue = handlers.getQueue();
     queue = queue.concat(command.slice(2).map(item => command[1] + "/" + item));
     handlers.setQueue(queue);
@@ -197,9 +201,16 @@ function parseCommand(command,handlers,callback) {
       return;
     }
     var toIndex;
-    if ( command[2] == "false" ) toIndex = fromIndex - 1;
-    else toIndex = 1;
-    queue.splice(toIndex,0,queue.splice(fromIndex,1)[0]);
+    if ( command[2] == "false" ) {
+      toIndex = fromIndex - 1;
+      queue.splice(toIndex,0,queue.splice(fromIndex,1)[0]);
+    } else {
+      toIndex = 1;
+      if ( genTimeout <= 0 ) {
+        queue.splice(toIndex,0,queue.splice(fromIndex,1)[0]);
+        genTimeout = 150;
+      }
+    }
     handlers.setQueue(queue);
     callback([(handlers.isPlaying() ? "playing" : "paused") + ":" + handlers.getVolume()].concat(handlers.getQueue()));
   } else if ( commandName == "DWNSQ" ) {
@@ -220,7 +231,10 @@ function parseCommand(command,handlers,callback) {
       callback([(handlers.isPlaying() ? "playing" : "paused") + ":" + handlers.getVolume()].concat(handlers.getQueue()));
       return;
     }
-    queue.splice(index,1);
+    if ( genTimeout <= 0 ) {
+      queue.splice(index,1);
+      genTimeout = 150;
+    }
     handlers.setQueue(queue);
     callback([(handlers.isPlaying() ? "playing" : "paused") + ":" + handlers.getVolume()].concat(handlers.getQueue()));
   } else if ( commandName == "CLRQ" ) {

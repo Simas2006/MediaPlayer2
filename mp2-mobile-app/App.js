@@ -12,6 +12,8 @@ import {
 } from './components'
 import styles from './stylesheet'
 
+console.ignoredYellowBox = ["Warning: Can't call setState"];
+
 export default class App extends React.Component {
   constructor() {
     super();
@@ -115,9 +117,11 @@ export default class App extends React.Component {
   }
   _setParam(param,value) {
     var obj = {};
-    if ( this.state.interval > -1 ) {
-      clearInterval(this.state.interval);
-      obj.interval = -1;
+    if ( this.state.interval ) {
+      for ( var i = 0; i < this.state.interval.length; i++ ) {
+        clearInterval(this.state.interval[i]);
+      }
+      obj.interval = null;
     }
     obj[param] = value;
     this.setState(obj);

@@ -15,6 +15,7 @@ class MusicAgent {
     this.playing = true;
     this.volume = 50;
     this.volumeTimeout = 0;
+    this.tnsTimeout = 0;
     this.audio = document.getElementById("audio");
     this.audio.volume = 0.5;
     this.audio.onended = function() {
@@ -23,6 +24,7 @@ class MusicAgent {
     setInterval(this.updateTimeInfo.bind(this),1000);
     setInterval(_ => {
       this.volumeTimeout = Math.max(this.volumeTimeout - 1,0);
+      this.tnsTimeout = Math.max(this.tnsTimeout - 1,0);
     },1);
   }
   render() {
@@ -61,6 +63,8 @@ class MusicAgent {
     });
   }
   triggerNextSong(newElements) {
+    if ( this.tnsTimeout > 0 ) return;
+    this.tnsTimeout = 150;
     if ( ! newElements ) this.queue.splice(0,1);
     if ( this.queue[0] ) {
       this.audio.src = replaceAll("#","%23",replaceAll("?","%3F",DATA_LOC + "/" + this.queue[0]));
@@ -174,9 +178,10 @@ class PhotoAgent {
     return this.albumFiles[this.albumIndex];
   }
   eMovePicture(toMove) {
-    if ( this.timeout > 0 ) return decodeURIComponent(this.albumFiles[this.albumIndex]);
-    this.timeout = 100;
-    this.albumIndex += toMove;
+    if ( this.timeout <= 0 ) {
+      this.timeout = 100;
+      this.albumIndex += toMove;
+    }
     var suffix = "";
     if ( this.albumIndex <= -1 ) this.albumIndex = this.albumFiles.length - 1;
     if ( this.albumIndex == 0 && toMove == -1 ) suffix = "_first";
