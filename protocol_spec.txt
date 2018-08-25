@@ -36,7 +36,8 @@ SHFLQ                      ; Shuffles the queue. Returns "ok" normally.
 
 --- DLP Command Spec ---
 LIST                       ; Returns a comma-separated list of all photo albums normally.
-DWNLD <album>              ; Returns an (encrypted) zip file corresponding to the album data normally.
+INTDL <album>              ; Returns the IV to be used to decrypt the ZIP file and a unique ID to use when downloading the file, separated by a comma. Should always be run before DWNLD.
+DWNLD <id>                 ; Returns an (encrypted, without IV appended) zip file corresponding to the album data normally. Will return "error" if the ID is invalid.
 
 --- Layer Spec ---
 Mobile App Front-End (shows choices to user)
