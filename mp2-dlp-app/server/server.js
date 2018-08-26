@@ -83,7 +83,7 @@ app.post("/receive",function(request,response) {
   });
   request.on("end",function() {
     var cg = new Cryptographer();
-    var message = cg.decrypt(data,PASSWORD).split(" ");
+    var message = cg.decrypt(data,PASSWORD).split(" ").map(item => decodeURIComponent(item));
     if ( message[0] == "decrypt-failed" ) {
       response.send("error");
     } else {
@@ -95,7 +95,7 @@ app.post("/receive",function(request,response) {
       } else if ( message[0] == "INTDL" ) {
         fs.readdir(PHOTO_LOC,function(err,files) {
           if ( err ) throw err;
-          files = files.filter(item => ! item.startsWith(".")).map(item => encodeURIComponent(item));
+          files = files.filter(item => ! item.startsWith("."));
           if ( files.indexOf(message[1]) <= -1 ) {
             response.send("error");
             return;
