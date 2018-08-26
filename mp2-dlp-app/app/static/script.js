@@ -3,6 +3,8 @@ var rcrypto = require("crypto");
 var request = require("request");
 var decompress = require("decompress");
 var PASSWORD = "password";
+var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2-dlp" : "/var/local");
+var DATA_LOC = LOCAL_DIR + "/LocalData";
 
 class Cryptographer {
   encrypt(text,key) {
@@ -39,16 +41,21 @@ function downloadAlbum(album,callback) {
     if ( err ) throw err;
     if ( body != "error" ) {
       body = cg.decrypt(body,PASSWORD).split(",");
-      var writer = fs.createWriteStream(__dirname + "/../output.zip");
-      var cipher = rcrypto.createDecipheriv("aes-256-cbc",new Buffer("/".repeat(32 - PASSWORD.length) + PASSWORD),Buffer.from(body[1],"base64"));
-      request({
-        method: "POST",
-        uri: "http://localhost:5601/receive",
-        body: cg.encrypt("DWNLD " + body[0],PASSWORD)
-      }).pipe(cipher).pipe(writer);
-      writer.on("finish",function() {
-        decompress(__dirname + "/../output.zip",__dirname + "/../output").then(function() {
-          callback(true);
+      var writer = fs.createWriteStream(LOCAL_DIR + "/temp.zip");
+      writer.on("open",function() {
+        var cipher = rcrypto.createDecipheriv("aes-256-cbc",new Buffer("/".repeat(32 - PASSWORD.length) + PASSWORD),Buffer.from(body[1],"base64"));
+        request({
+          method: "POST",
+          uri: "http://localhost:5601/receive",
+          body: cg.encrypt("DWNLD " + body[0],PASSWORD)
+        }).pipe(cipher).pipe(writer);
+        writer.on("finish",function() {
+          decompress(LOCAL_DIR + "/temp.zip",DATA_LOC + "/" + album).then(function() {
+            fs.unlink(LOCAL_DIR + "/temp.zip",function(err) {
+              if ( err ) throw err;
+              callback(true);              
+            });
+          });
         });
       });
     } else {
