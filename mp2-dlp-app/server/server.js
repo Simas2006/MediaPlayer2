@@ -45,6 +45,37 @@ class Cryptographer {
   }
 }
 
+function walkDir(path,callback) {
+  var results = [];
+  fs.readdir(path,function(err,files) {
+    if ( err ) throw err;
+    var i = 0;
+    files = files.filter(item => ! item.startsWith("."));
+    function loop() {
+      if ( i >= files.length ) {
+        callback(results);
+        return;
+      }
+      var file = files[i];
+      var fullPath = path + "/" + file;
+      var lpath = fullPath.toLowerCase();
+      fs.stat(fullPath,function(err,stat) {
+        i++;
+        if ( stat && stat.isDirectory() ) {
+          walkDir(fullPath,function(output) {
+            results = results.concat(output);
+            loop();
+          });
+        } else {
+          if ( lpath.endsWith(".jpg") || lpath.endsWith(".png") || lpath.endsWith(".gif") ) results.push(fullPath);
+          loop();
+        }
+      });
+    }
+    loop();
+  });
+}
+
 app.post("/receive",function(request,response) {
   var data = "";
   request.on("data",function(chunk) {
@@ -91,8 +122,13 @@ app.post("/receive",function(request,response) {
         });
         archive.pipe(cipher);
         cipher.pipe(response);
-        archive.directory(PHOTO_LOC + "/" + ivs[message[1]].dir,false);
-        archive.finalize();
+        walkDir(PHOTO_LOC + "/" + ivs[message[1]].dir,function(results) {
+          for ( var i = 0; i < results.length; i++ ) {
+            var trimmedName = results[i].replace(PHOTO_LOC + "/" + ivs[message[1]].dir + "/","");
+            archive.file(results[i],{name: trimmedName});
+          }
+          archive.finalize();
+        });
       }
     }
   });
