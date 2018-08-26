@@ -1,6 +1,7 @@
 var fs = require("fs");
 var rcrypto = require("crypto");
 var request = require("request");
+var decompress = require("decompress");
 var PASSWORD = "password";
 
 class Cryptographer {
@@ -46,7 +47,9 @@ function downloadAlbum(album,callback) {
         body: cg.encrypt("DWNLD " + body[0],PASSWORD)
       }).pipe(cipher).pipe(writer);
       writer.on("finish",function() {
-        callback(true);
+        decompress(__dirname + "/../output.zip",__dirname + "/../output").then(function() {
+          callback(true);
+        });
       });
     } else {
       callback(false);
