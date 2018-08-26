@@ -53,7 +53,7 @@ function downloadAlbum(album,callback) {
           decompress(LOCAL_DIR + "/temp.zip",DATA_LOC + "/" + album).then(function() {
             fs.unlink(LOCAL_DIR + "/temp.zip",function(err) {
               if ( err ) throw err;
-              callback(true);              
+              callback(true);
             });
           });
         });
@@ -61,5 +61,17 @@ function downloadAlbum(album,callback) {
     } else {
       callback(false);
     }
+  });
+}
+
+function listRemoteAlbums(callback) {
+  var cg = new Cryptographer();
+  request({
+    method: "POST",
+    uri: "http://localhost:5601/receive",
+    body: cg.encrypt("LIST",PASSWORD)
+  },function(err,response,body) {
+    if ( err ) throw err;
+    callback(body.split(",").map(item => decodeURIComponent(item)));
   });
 }
