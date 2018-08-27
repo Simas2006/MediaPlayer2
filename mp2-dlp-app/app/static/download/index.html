@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>MediaPlayer2-DLP</title>
+  <link rel="stylesheet" type="text/css" href="../style.css" />
+  <script>
+    window.onload = function() {
+      document.getElementById("downloadText").innerText = `Downloading "${decodeURIComponent(location.search.slice(1))}"...`;
+    }
+  </script>
+</head>
+<body>
+  <div id="centerPanel">
+    <br />
+    <p id="downloadText"></p>
+    <br />
+    <br />
+  </div>
+  <video width="100%" preload autoplay loop>
+    <source src="loading.mp4" type="video/mp4" />
+  </video>
+</body>
+</html>
