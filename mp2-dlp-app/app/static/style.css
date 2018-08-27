@@ -1,0 +1,18 @@
+body,button {
+  font-family: "Menlo";
+  font-size: 100%;
+}
+button {
+  border: 0px;
+  background-color: white;
+}
+h1,p {
+  margin: 0;
+  font-weight: normal;
+}
+#centerPanel {
+  text-align: center;
+}
+.green {
+  color: green;
+}
