@@ -71,7 +71,10 @@ function listRemoteAlbums(callback) {
     uri: "http://localhost:5601/receive",
     body: cg.encrypt("LIST",PASSWORD)
   },function(err,response,body) {
-    if ( err ) throw err;
+    if ( err ) {
+      callback(null);
+      throw err;
+    }
     callback(body.split(",").map(item => decodeURIComponent(item)));
   });
 }

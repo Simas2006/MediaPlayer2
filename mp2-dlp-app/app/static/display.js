@@ -1,8 +1,13 @@
 var {ipcRenderer} = require("electron");
 var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2-dlp" : "/var/local");
 var DATA_LOC = LOCAL_DIR + "/LocalData";
+var hasLoaded = false;
 
 function drawDownloadPage() {
+  if ( ! hasLoaded ) {
+    document.getElementById("topText").innerText = "Status: Loading...";
+    hasLoaded = true;
+  }
   var localObj = document.getElementById("localAlbums");
   while ( localObj.firstChild ) {
     localObj.removeChild(localObj.firstChild);
@@ -26,6 +31,12 @@ function drawDownloadPage() {
       remoteObj.removeChild(remoteObj.firstChild);
     }
     listRemoteAlbums(function(rlist) {
+      if ( rlist ) {
+        document.getElementById("topText").innerText = "Status: Connected";
+      } else {
+        document.getElementById("topText").innerText = "Status: Unable to Connect";
+        return;
+      }
       rlist = rlist.filter(item => llist.indexOf(item) <= -1);
       for ( var i = 0; i < rlist.length; i++ ) {
         var li = document.createElement("li");
