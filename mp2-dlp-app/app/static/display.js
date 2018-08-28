@@ -4,7 +4,7 @@ var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.e
 var DATA_LOC = LOCAL_DIR + "/LocalData";
 var hasLoaded = false;
 var folderPath = [];
-var photoIndex = 0;
+var pictureIndex = 0;
 
 function replaceAll(oldChar,newChar,string) {
   return string.split(oldChar).join(newChar);
@@ -111,10 +111,12 @@ function drawPhotoPage() {
     throw new Error("No ratio found");
   }
   fs.readdir(DATA_LOC + "/" + folderPath.join("/"),function(err,files) {
-    var photoName = files[photoIndex];
+    var pictureName = files[pictureIndex];
+    document.getElementById("fnameText").innerText = pictureName;
+    document.getElementById("topText").innerText = "Album: " + folderPath.join("/");
     var picture = document.getElementById("picture");
     var img = new Image();
-    img.src = replaceAll("#","%23",replaceAll("?","%3F",DATA_LOC + "/" + folderPath.join("/") + "/" + photoName));
+    img.src = replaceAll("#","%23",replaceAll("?","%3F",DATA_LOC + "/" + folderPath.join("/") + "/" + pictureName));
     img.onload = function() {
       EXIF.getData(img,function() {
         var orientation = EXIF.getTag(this,"Orientation");
@@ -132,8 +134,19 @@ function drawPhotoPage() {
   });
 }
 
+function movePicture(modifier) {
+  pictureIndex += modifier;
+  if ( pictureIndex < 0 ) pictureIndex = 0;
+  fs.readdir(DATA_LOC + "/" + folderPath.join("/"),function(err,files) {
+    if ( err ) throw err;
+    if ( pictureIndex >= files.length ) pictureIndex = files.length - 1;
+    drawPhotoPage();
+  });
+}
+
 function moveBackPage() {
   folderPath.pop();
+  pictureIndex = 0;
   if ( folderPath.length > 0 ) {
     drawNavigationPage();
     openPage("navigation");
