@@ -76,6 +76,7 @@ function drawNavigationPage() {
         return;
       }
     }
+    document.getElementById("topText").innerText = "Album: " + folderPath.join("/");
     for ( var i = 0; i < files.length; i++ ) {
       var li = document.createElement("li");
       var button = document.createElement("button");
@@ -92,7 +93,14 @@ function drawNavigationPage() {
 }
 
 function moveBackPage() {
-  
+  folderPath.pop();
+  if ( folderPath.length > 0 ) {
+    drawNavigationPage();
+    openPage("navigation");
+  } else {
+    drawDownloadPage();
+    openPage("download");
+  }
 }
 
 function openPage(toOpen) {
