@@ -2,6 +2,7 @@ var {ipcRenderer} = require("electron");
 var EXIF = require("exif-js");
 var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2-dlp" : "/var/local");
 var DATA_LOC = LOCAL_DIR + "/LocalData";
+var currentPage;
 var hasLoaded = false;
 var folderPath = [];
 var pictureIndex = 0;
@@ -146,7 +147,10 @@ function movePicture(modifier) {
 
 function moveBackPage() {
   folderPath.pop();
-  pictureIndex = 0;
+  if ( currentPage == "photo" ) {
+    pictureIndex = 0;
+    document.getElementById("picture").style.display = "none";
+  }
   if ( folderPath.length > 0 ) {
     drawNavigationPage();
     openPage("navigation");
@@ -162,9 +166,17 @@ function openPage(toOpen) {
     document.getElementById(pages[i] + "Page").className = "hidden";
   }
   document.getElementById(toOpen + "Page").className = "";
+  currentPage = toOpen;
 }
 
 window.onload = function() {
-  openPage("download");
   drawDownloadPage();
+  openPage("download");
+}
+
+window.onkeydown = function(event) {
+  if ( currentPage == "photo" ) {
+    if ( event.code == "ArrowLeft" ) movePicture(-1);
+    if ( event.code == "ArrowRight" || event.code == "Space" ) movePicture(1);
+  }
 }
