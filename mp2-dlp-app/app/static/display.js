@@ -2,6 +2,7 @@ var {ipcRenderer} = require("electron");
 var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2-dlp" : "/var/local");
 var DATA_LOC = LOCAL_DIR + "/LocalData";
 var hasLoaded = false;
+var folderPath = [];
 
 function drawDownloadPage() {
   if ( ! hasLoaded ) {
@@ -21,7 +22,9 @@ function drawDownloadPage() {
       button.innerText = llist[i];
       button["data-index"] = i;
       button.onclick = function() {
-        console.log("l" + this["data-index"]);
+        folderPath.push(llist[button["data-index"]]);
+        drawNavigationPage();
+        openPage("navigation");
       }
       li.appendChild(button);
       localObj.appendChild(li);
@@ -59,6 +62,48 @@ function drawDownloadPage() {
   });
 }
 
+function drawNavigationPage() {
+  var folderObj = document.getElementById("folderList");
+  while ( folderObj.firstChild ) {
+    folderObj.removeChild(folderObj.firstChild);
+  }
+  fs.readdir(DATA_LOC + "/" + folderPath.join("/"),function(err,files) {
+    if ( err ) throw err;
+    files = files.filter(item => ! item.startsWith("."));
+    for ( var i = 0; i < files.length; i++ ) {
+      if ( files[i].charAt(files[i].length - 4) == "." ) {
+        openPage("photo");
+        return;
+      }
+    }
+    for ( var i = 0; i < files.length; i++ ) {
+      var li = document.createElement("li");
+      var button = document.createElement("button");
+      button.innerText = files[i];
+      button["data-index"] = i;
+      button.onclick = function() {
+        folderPath.push(files[this["data-index"]]);
+        drawNavigationPage();
+      }
+      li.appendChild(button);
+      folderObj.appendChild(li);
+    }
+  });
+}
+
+function moveBackPage() {
+  
+}
+
+function openPage(toOpen) {
+  var pages = ["download","navigation"];
+  for ( var i = 0; i < pages.length; i++ ) {
+    document.getElementById(pages[i] + "Page").className = "hidden";
+  }
+  document.getElementById(toOpen + "Page").className = "";
+}
+
 window.onload = function() {
+  openPage("download");
   drawDownloadPage();
 }

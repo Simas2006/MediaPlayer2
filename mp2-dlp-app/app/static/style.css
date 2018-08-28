@@ -13,3 +13,6 @@ h1,p {
 #centerPanel {
   text-align: center;
 }
+.hidden {
+  display: none;
+}
