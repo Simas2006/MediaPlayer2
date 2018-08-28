@@ -7,16 +7,7 @@ var PASSWORD = process.argv[2];
 var PORT = process.argv[3] || 5601;
 var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2" : "/var/local");
 var PHOTO_LOC = LOCAL_DIR + "/LocalData/photos";
-var ivs = {
-  "111": {
-    iv: crypto.randomBytes(16),
-    dir: "nested"
-  },
-  "112": {
-    iv: crypto.randomBytes(16),
-    dir: "nested"
-  }
-};
+var ivs = {};
 
 if ( ! PASSWORD ) throw new Error("No password provided");
 
@@ -60,6 +51,7 @@ function walkDir(path,callback) {
       var fullPath = path + "/" + file;
       var lpath = fullPath.toLowerCase();
       fs.stat(fullPath,function(err,stat) {
+        if ( err ) throw err;
         i++;
         if ( stat && stat.isDirectory() ) {
           walkDir(fullPath,function(output) {
@@ -87,7 +79,9 @@ app.post("/receive",function(request,response) {
     if ( message[0] == "decrypt-failed" ) {
       response.send("error");
     } else {
-      if ( message[0] == "LIST" ) {
+      if ( message[0] == "PING" ) {
+        response.send("ok");
+      } else if ( message[0] == "LIST" ) {
         fs.readdir(PHOTO_LOC,function(err,files) {
           if ( err ) throw err;
           response.send(files.filter(item => ! item.startsWith(".")).map(item => encodeURIComponent(item)).join(","));
