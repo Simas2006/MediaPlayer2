@@ -10,6 +10,10 @@ h1,p {
   margin: 0;
   font-weight: normal;
 }
+#picture-container {
+  text-align: center;
+  overflow: hidden;
+}
 #centerPanel {
   text-align: center;
 }
