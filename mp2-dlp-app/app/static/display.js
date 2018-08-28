@@ -29,7 +29,7 @@ function drawDownloadPage() {
       button.innerText = llist[i];
       button["data-index"] = i;
       button.onclick = function() {
-        folderPath.push(llist[button["data-index"]]);
+        folderPath.push(llist[this["data-index"]]);
         drawNavigationPage();
         openPage("navigation");
       }
@@ -170,8 +170,10 @@ function openPage(toOpen) {
 }
 
 window.onload = function() {
-  drawDownloadPage();
-  openPage("download");
+  initConnection(function() {
+    drawDownloadPage();
+    openPage("download");
+  });
 }
 
 window.onkeydown = function(event) {

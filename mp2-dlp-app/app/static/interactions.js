@@ -2,7 +2,7 @@ var fs = require("fs");
 var rcrypto = require("crypto");
 var request = require("request");
 var decompress = require("decompress");
-var PASSWORD = "password";
+var URL,PASSWORD;
 var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2-dlp" : "/var/local");
 var DATA_LOC = LOCAL_DIR + "/LocalData";
 
@@ -35,7 +35,7 @@ function downloadAlbum(album,callback) {
   var cg = new Cryptographer();
   request({
     method: "POST",
-    uri: "http://localhost:5601/receive",
+    uri: `http://${URL}:5601/receive`,
     body: cg.encrypt("INTDL " + encodeURIComponent(album),PASSWORD)
   },function(err,response,body) {
     if ( err ) throw err;
@@ -46,7 +46,7 @@ function downloadAlbum(album,callback) {
         var cipher = rcrypto.createDecipheriv("aes-256-cbc",new Buffer("/".repeat(32 - PASSWORD.length) + PASSWORD),Buffer.from(body[1],"base64"));
         request({
           method: "POST",
-          uri: "http://localhost:5601/receive",
+          uri: `http://${URL}:5601/receive`,
           body: cg.encrypt("DWNLD " + body[0],PASSWORD)
         }).pipe(cipher).pipe(writer);
         writer.on("finish",function() {
@@ -68,7 +68,7 @@ function listRemoteAlbums(callback) {
   var cg = new Cryptographer();
   request({
     method: "POST",
-    uri: "http://localhost:5601/receive",
+    uri: `http://${URL}:5601/receive`,
     body: cg.encrypt("LIST",PASSWORD)
   },function(err,response,body) {
     if ( err ) {
@@ -76,5 +76,15 @@ function listRemoteAlbums(callback) {
       throw err;
     }
     callback(body.split(",").map(item => decodeURIComponent(item)));
+  });
+}
+
+function initConnection(callback) {
+  fs.readFile(LOCAL_DIR + "/ConnectData.json",function(err,data) {
+    if ( err ) throw err;
+    data = JSON.parse(data.toString());
+    URL = data.url;
+    PASSWORD = data.password;
+    callback();
   });
 }
