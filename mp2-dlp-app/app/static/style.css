@@ -10,6 +10,11 @@ h1,p {
   margin: 0;
   font-weight: normal;
 }
+input {
+  height: 20px;
+  font-family: "Menlo";
+  font-size: 100%;
+}
 #picture-container {
   text-align: center;
   overflow: hidden;
@@ -22,4 +27,7 @@ h1,p {
 }
 .rightAlign {
   float: right;
+}
+.withBorder {
+  border: 1px solid black;
 }
