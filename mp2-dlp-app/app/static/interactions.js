@@ -71,9 +71,10 @@ function listRemoteAlbums(callback) {
     uri: `http://${URL}:5601/receive`,
     body: cg.encrypt("LIST",PASSWORD)
   },function(err,response,body) {
-    if ( err ) {
+    if ( err || body == "error" ) {
       callback(null);
-      throw err;
+      if ( err ) throw err;
+      else throw new Error("Invalid password");
     }
     callback(body.split(",").map(item => decodeURIComponent(item)));
   });

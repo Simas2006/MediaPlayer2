@@ -122,6 +122,7 @@ app.post("/receive",function(request,response) {
             archive.file(results[i],{name: trimmedName});
           }
           archive.finalize();
+          ivs[message[1]] = null;
         });
       }
     }
