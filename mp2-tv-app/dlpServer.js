@@ -9,6 +9,7 @@ var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.e
 var PHOTO_LOC = LOCAL_DIR + "/LocalData/photos";
 var PASSWORD = fs.readFileSync(LOCAL_DIR + "/ServerPassword").toString().trim();
 var PORT = 5601;
+var SHUTDOWN_PATH = (process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2" : "/var/local")) + "/ServerData/shutdown";
 var ivs = {};
 
 class Cryptographer {
@@ -133,6 +134,17 @@ app.get("/blank",function(request,response) {
   response.send("hi");
 });
 
+function checkForShutdown() {
+  fs.stat(SHUTDOWN_PATH,function(err) {
+    if ( err ) {
+      if ( err.code == "ENOENT" ) return;
+      else throw err;
+    }
+    process.exit();
+  });
+}
+
 app.listen(PORT,function() {
   console.log("Listening on port " + PORT);
+  setInterval(checkForShutdown,1500);
 });
