@@ -9,7 +9,7 @@ function createWindow() {
     width: size.width,
     height: size.height
   });
-  window.webContents.openDevTools();
+  //window.webContents.openDevTools();
   window.on("closed",function() {
     window = null;
   });

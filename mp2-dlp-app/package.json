@@ -7,6 +7,9 @@
     "test": "electron .",
     "build": "rm -r dist; electron-builder ."
   },
+  "build": {
+    "asar": false
+  },
   "author": "Simas Juknelis",
   "license": "MIT",
   "dependencies": {
