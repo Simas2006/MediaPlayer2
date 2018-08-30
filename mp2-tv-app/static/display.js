@@ -229,6 +229,13 @@ function openFolder() {
   shell.openItem(DATA_LOC);
 }
 
+function startDLPServer() {
+  initDLPServer(function() {
+    document.getElementById("dlpText").innerText = "DLP Server Enabled";
+    document.getElementById("dlpLink").innerText = "";
+  });
+}
+
 /* API Handlers
  * - getQueue √
  * - setQueue √

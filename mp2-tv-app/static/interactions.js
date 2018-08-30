@@ -4,7 +4,7 @@ var remote = require("electron").remote;
 var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2" : "/var/local");
 var DATA_LOC = LOCAL_DIR + "/LocalData";
 var SERVER_LOC = LOCAL_DIR + "/ServerData";
-var serverProc;
+var serverProc,dlpProc;
 var lastVolume = 0;
 var addTimeout = 0;
 var genTimeout = 0;
@@ -277,4 +277,11 @@ function forceDCONN() {
       if ( err ) throw err;
     });
   });
+}
+
+function initDLPServer(callback) {
+  dlpProc = execFile(__dirname + "/../dlpServer.js",[],function(err,stdout,stderr) {
+    if ( err ) throw err;
+  });
+  callback();
 }

@@ -1,3 +1,5 @@
+#!/usr/local/bin/node
+
 var fs = require("fs");
 var crypto = require("crypto");
 var archiver = require("archiver");
@@ -6,7 +8,7 @@ var app = express();
 var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2" : "/var/local");
 var PHOTO_LOC = LOCAL_DIR + "/LocalData/photos";
 var PASSWORD = fs.readFileSync(LOCAL_DIR + "/ServerPassword").toString().trim();
-var PORT = 5600;
+var PORT = 5601;
 var ivs = {};
 
 class Cryptographer {
