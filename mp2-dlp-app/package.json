@@ -4,14 +4,17 @@
   "description": "Local app for MP2-DLP",
   "main": "main.js",
   "scripts": {
-    "test": "electron ."
+    "test": "electron .",
+    "build": "rm -r dist; electron-builder ."
   },
   "author": "Simas Juknelis",
   "license": "MIT",
   "dependencies": {
     "decompress": "^4.2.0",
-    "electron": "^2.0.8",
     "exif-js": "^2.3.0",
     "request": "^2.88.0"
+  },
+  "devDependencies": {
+    "electron": "^2.0.8"
   }
 }
