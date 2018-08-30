@@ -26,3 +26,11 @@ Download the Expo app (if you don't have it already), and open in your browser o
 - This app is licensed under the Apache License. Feel free to expand on the app and make it more cross-platform/better in general!
 
 I know some of these things may not be ideal, these were my requirements, and it Works On My Machine™.
+
+### DLP?
+
+DLP stands for "Download Proxy". It allows you to download and view pictures stored within MediaPlayer2. In the main app, click to enable the DLP server, and in the DLP client app, enter the IP of the server and the password (it will be the same as for the mobile app).
+
+Within the app, you will have access both to albums you have downloaded (which use the same resize algorithm as the main app), and to download new albums over a secure connection. The DLP client app works offline too.
+
+Download the DLP client app [here](https://github.com/Simas2006/MediaPlayer2/releases/latest). It does not require Node to be preinstalled.
