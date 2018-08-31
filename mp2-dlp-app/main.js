@@ -1,6 +1,6 @@
 var {app,BrowserWindow,ipcMain} = require("electron");
 var fs = require("fs");
-var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2" : "/var/local");
+var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2-dlp" : "/var/local");
 var window,downloadWindow;
 
 function createWindow() {
@@ -13,7 +13,14 @@ function createWindow() {
   window.on("closed",function() {
     window = null;
   });
-  window.loadURL(`file://${__dirname}/static/index.html`);
+  fs.stat(LOCAL_DIR + "/ConnectData.json",function(err) {
+    var subText = "";
+    if ( err ) {
+      if ( err.code == "ENOENT" ) subText = "prompt/";
+      else throw err;
+    }
+    window.loadURL(`file://${__dirname}/static/${subText}index.html`);
+  });
   ipcMain.on("openDownload",function(event,album) {
     downloadWindow = new BrowserWindow({
       width: 500,
