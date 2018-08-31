@@ -2,6 +2,7 @@ var {ipcRenderer} = require("electron");
 var EXIF = require("exif-js");
 var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2-dlp" : "/var/local");
 var DATA_LOC = LOCAL_DIR + "/LocalData";
+var language = require("./lang/language")();
 var currentPage;
 var hasLoaded = false;
 var folderPath = [];
@@ -13,7 +14,7 @@ function replaceAll(oldChar,newChar,string) {
 
 function drawDownloadPage() {
   if ( ! hasLoaded ) {
-    document.getElementById("topText").innerText = "Status: Loading...";
+    document.getElementById("topText").innerText = language.status.loading;
     hasLoaded = true;
   }
   var localObj = document.getElementById("localAlbums");
@@ -42,9 +43,9 @@ function drawDownloadPage() {
     }
     listRemoteAlbums(function(rlist) {
       if ( rlist ) {
-        document.getElementById("topText").innerText = "Status: Connected";
+        document.getElementById("topText").innerText = language.status.success;
       } else {
-        document.getElementById("topText").innerText = "Status: Unable to Connect";
+        document.getElementById("topText").innerText = language.status.fail;
         return;
       }
       rlist = rlist.filter(item => llist.indexOf(item) <= -1);
@@ -84,7 +85,7 @@ function drawNavigationPage() {
         return;
       }
     }
-    document.getElementById("topText").innerText = "Album: " + folderPath.join("/");
+    document.getElementById("topText").innerText = language.album + ": " + folderPath.join("/");
     for ( var i = 0; i < files.length; i++ ) {
       var li = document.createElement("li");
       var button = document.createElement("button");
@@ -114,7 +115,7 @@ function drawPhotoPage() {
   fs.readdir(DATA_LOC + "/" + folderPath.join("/"),function(err,files) {
     var pictureName = files[pictureIndex];
     document.getElementById("fnameText").innerText = pictureName;
-    document.getElementById("topText").innerText = "Album: " + folderPath.join("/");
+    document.getElementById("topText").innerText = language.album + ": " + folderPath.join("/");
     var picture = document.getElementById("picture");
     var img = new Image();
     img.src = replaceAll("#","%23",replaceAll("?","%3F",DATA_LOC + "/" + folderPath.join("/") + "/" + pictureName));
@@ -170,6 +171,8 @@ function openPage(toOpen) {
 }
 
 window.onload = function() {
+  document.getElementById("back1").innerText = `<- ${language.back}`;
+  document.getElementById("back2").innerText = `<- ${language.back}`;
   initConnection(function() {
     drawDownloadPage();
     openPage("download");

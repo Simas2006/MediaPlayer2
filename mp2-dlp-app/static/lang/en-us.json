@@ -1,0 +1,19 @@
+{
+  "name": "English",
+  "status": {
+    "loading": "Status: Loading...",
+    "success": "Status: Connected",
+    "fail": "Status: Unable to Connect"
+  },
+  "album": "Album",
+  "back": "Back",
+  "downloadText": "Downloading",
+  "prompt": {
+    "welcome": "Welcome to MediaPlayer2 DLP!",
+    "language": "Language",
+    "address": "Address",
+    "password": "Password",
+    "connect": "Connect",
+    "invalid": "Incorrect address or password. Please try again."
+  }
+}

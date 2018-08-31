@@ -5,8 +5,9 @@
   <title>MediaPlayer2-DLP</title>
   <link rel="stylesheet" type="text/css" href="../style.css" />
   <script>
+    var language = require("../lang/language")();
     window.onload = function() {
-      document.getElementById("downloadText").innerText = `Downloading "${decodeURIComponent(location.search.slice(1))}"...`;
+      document.getElementById("downloadText").innerText = `${language.downloadText} "${decodeURIComponent(location.search.slice(1))}"...`;
     }
   </script>
 </head>

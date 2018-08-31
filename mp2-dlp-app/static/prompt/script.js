@@ -2,6 +2,7 @@ var fs = require("fs");
 var rcrypto = require("crypto");
 var request = require("request");
 var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2-dlp" : "/var/local");
+var language = require("../lang/language")(localStorage.getItem("lang") || "en-us");
 
 class Cryptographer {
   encrypt(text,key) {
@@ -40,8 +41,10 @@ function initializeData() {
     if ( ! err && body != "error" ) {
       var obj = {
         url: address,
-        password: password
+        password: password,
+        lang: (localStorage.getItem("lang") || "en-us")
       }
+      localStorage.removeItem("lang");
       fs.mkdir(LOCAL_DIR,function(err) {
         if ( err && err.code != "EEXIST" ) throw err;
         fs.writeFile(LOCAL_DIR + "/ConnectData.json",JSON.stringify(obj),function(err) {
@@ -53,7 +56,39 @@ function initializeData() {
         });
       });
     } else {
-      alert("Incorrect address or password. Please try again.");
+      alert(language.prompt.invalid);
     }
   });
+}
+
+function initSelectBox() {
+  var language = document.getElementById("language");
+  fs.readdir(__dirname + "/../lang",function(err,files) {
+    if ( err ) throw err;
+    var files = files.filter(item => item.endsWith(".json"));
+    var names = files
+      .map(item => JSON.parse(fs.readFileSync(__dirname + "/../lang/" + item).toString()))
+      .map(item => item.name);
+    files = files.map(item => item.slice(0,-5));
+    for ( var i = 0; i < names.length; i++ ) {
+      var option = document.createElement("option");
+      option.innerText = names[i];
+      option.value = files[i];
+      language.appendChild(option);
+    }
+    language.onchange = function() {
+      localStorage.setItem("lang",this.value);
+      location.reload();
+    }
+    language.value = localStorage.getItem("lang") || "en-us";
+  });
+}
+
+window.onload = function() {
+  document.getElementById("welcomeText").innerText = language.prompt.welcome;
+  document.getElementById("languageText").innerText = language.prompt.language + ": ";
+  document.getElementById("address").placeholder = language.prompt.address;
+  document.getElementById("password").placeholder = language.prompt.password;
+  document.getElementById("connButton").innerText = language.prompt.connect;
+  initSelectBox();
 }
