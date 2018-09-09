@@ -3,6 +3,10 @@ var fs = require("fs");
 var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2-dlp" : "/var/local");
 var window,downloadWindow;
 
+function replaceAll(oldChar,newChar,string) {
+  return string.split(oldChar).join(newChar);
+}
+
 function createWindow() {
   var size = require("electron").screen.getPrimaryDisplay().size;
   window = new BrowserWindow({
@@ -29,7 +33,7 @@ function createWindow() {
     downloadWindow.on("closed",function() {
       downloadWindow = null;
     });
-    downloadWindow.loadURL(`file://${__dirname}/static/download/index.html?${album}`);
+    downloadWindow.loadURL(`file://${__dirname}/static/download/index.html?${replaceAll("#","%23",replaceAll("?","%3F",album))}`);
   });
   ipcMain.on("closeDownload",function(event) {
     downloadWindow.close();
