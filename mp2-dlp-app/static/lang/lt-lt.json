@@ -1,0 +1,19 @@
+{
+  "name": "Lietuviu",
+  "status": {
+    "loading": "Bukle: Kraunasi...",
+    "success": "Bukle: Prisijunges",
+    "fail": "Bukle: Negali prisijungt"
+  },
+  "album": "Albumas",
+  "back": "Atgal",
+  "download": "Kraunasi",
+  "prompt": {
+    "welcome": "Svieki atvyke i MediaPlayer2 DLP!",
+    "language": "Kalba",
+    "address": "Adresas",
+    "password": "Slaptazodis",
+    "connect": "Prisijunk",
+    "invalid": "Neteisingas adresas arba slaptazodis. Bandikite is naujo."
+  }
+}
