@@ -7,7 +7,7 @@
   },
   "album": "Album",
   "back": "Back",
-  "downloadText": "Downloading",
+  "download": "Downloading",
   "prompt": {
     "welcome": "Welcome to MediaPlayer2 DLP!",
     "language": "Language",
