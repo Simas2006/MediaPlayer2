@@ -13,7 +13,6 @@
   "author": "Simas Juknelis",
   "license": "MIT",
   "dependencies": {
-    "decompress": "^4.2.0",
     "exif-js": "^2.3.0",
     "request": "^2.88.0"
   },
