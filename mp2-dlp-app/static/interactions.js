@@ -1,10 +1,11 @@
 var fs = require("fs");
 var rcrypto = require("crypto");
 var request = require("request");
-var decompress = require("decompress");
+var {spawn} = require("child_process");
 var URL,PASSWORD;
 var LOCAL_DIR = process.env.APPDATA || (process.platform == "darwin" ? process.env.HOME + "/Library/Application Support/MediaPlayer2-dlp" : "/var/local");
 var DATA_LOC = LOCAL_DIR + "/LocalData";
+var unzipProc;
 
 class Cryptographer {
   encrypt(text,key) {
@@ -50,11 +51,16 @@ function downloadAlbum(album,callback) {
           body: cg.encrypt("DWNLD " + body[0],PASSWORD)
         }).pipe(cipher).pipe(writer);
         writer.on("finish",function() {
-          decompress(LOCAL_DIR + "/temp.zip",DATA_LOC + "/" + album).then(function() {
-            fs.unlink(LOCAL_DIR + "/temp.zip",function(err) {
-              if ( err ) throw err;
-              callback(true);
-            });
+          unzipProc = spawn("unzip",[LOCAL_DIR + "/temp.zip","-d",DATA_LOC + "/" + album]);
+          unzipProc.stdout.on("data",function(data) {
+            // needs to be here
+          });
+          unzipProc.stderr.on("data",function(data) {
+            console.log("ERROR: ",data.toString());
+          });
+          unzipProc.on("close",function(code) {
+            unzipProc = null;
+            callback(true);
           });
         });
       });
